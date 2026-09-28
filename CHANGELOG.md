@@ -5,6 +5,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+## [1.38] - 2026-09-27
+### Changed
+- **Dependencies Updated**: Updated `androidx.navigation:navigation-compose` to `2.10.2`, `androidx.work:work-runtime-ktx` to `2.12.0`, and Gradle build tools to `9.4.1`.
+- **Codebase Cleanup**: Removed deprecated legacy RadioDroid XML views and redundant resources.
+- **Documentation & Metadata**: Updated `README.md` with official F-Droid badges, UML diagrams, and corrected LICENSE file links.
+
 ## [1.37] - 2026-09-16
 ### Added
 - **F-Droid Reproducible Build Pipeline**: Hardened the entire compilation chain to enable byte-accurate APK verification for F-Droid. 
