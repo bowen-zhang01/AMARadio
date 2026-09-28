@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ounben.amaradio.AMARadioApp
 import com.ounben.amaradio.R
+import com.ounben.amaradio.Utils
 import com.ounben.amaradio.station.DataRadioStation
 import kotlinx.coroutines.launch
 
@@ -39,15 +40,15 @@ fun TabsScreen(
 ) {
     val context = LocalContext.current
     val app = context.applicationContext as AMARadioApp
-    val countryCode = remember { com.ounben.amaradio.Utils.getCountryCode(context) }
+    val countryCode = remember { Utils.getCountryCode(context) ?: "US" }
     val filterViewModel: FilterViewModel = viewModel()
     val filterState by filterViewModel.uiState.collectAsState()
     val coroutineScope = rememberCoroutineScope()
 
-    // Build Dynamic Tab List (Removed Search Tab)
+    // Build Dynamic Tab List (Guaranteed non-empty: at least Local tab exists)
     val tabs = remember(countryCode, filterState.tabs) {
         mutableListOf<MainTab>().apply {
-            if (countryCode != null) add(MainTab.Local)
+            add(MainTab.Local)
             filterState.tabs.forEachIndexed { index, tab ->
                 add(MainTab.Filter(index, tab.id, tab.label))
             }
@@ -83,47 +84,51 @@ fun TabsScreen(
                 .background(MaterialTheme.colorScheme.secondary),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            val safeSelectedIndex = remember(pagerState.currentPage, tabs.size) {
-                pagerState.currentPage.coerceIn(0, (tabs.size - 1).coerceAtLeast(0))
-            }
-
-            SecondaryScrollableTabRow(
-                selectedTabIndex = safeSelectedIndex,
-                modifier = Modifier.weight(1f),
-                edgePadding = 16.dp,
-                containerColor = Color.Transparent,
-                contentColor = MaterialTheme.colorScheme.onSecondary,
-                indicator = {
-                    TabRowDefaults.SecondaryIndicator(
-                        Modifier.tabIndicatorOffset(safeSelectedIndex),
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                },
-                divider = {}
-            ) {
-                tabs.forEachIndexed { index, tab ->
-                    Tab(
-                        selected = pagerState.currentPage == index,
-                        onClick = {
-                            coroutineScope.launch {
-                                pagerState.animateScrollToPage(index)
-                            }
-                        },
-                        text = { 
-                            val title = when (tab) {
-                                is MainTab.Local -> stringResource(R.string.action_local)
-                                is MainTab.Filter -> tab.label.ifBlank { "..." }
-                            }
-                            
-                            Text(
-                                text = title,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                                style = MaterialTheme.typography.labelLarge
-                            )
-                        }
-                    )
+            if (tabs.isNotEmpty()) {
+                val safeSelectedIndex = remember(pagerState.currentPage, tabs.size) {
+                    pagerState.currentPage.coerceIn(0, (tabs.size - 1).coerceAtLeast(0))
                 }
+
+                SecondaryScrollableTabRow(
+                    selectedTabIndex = safeSelectedIndex,
+                    modifier = Modifier.weight(1f),
+                    edgePadding = 16.dp,
+                    containerColor = Color.Transparent,
+                    contentColor = MaterialTheme.colorScheme.onSecondary,
+                    indicator = {
+                        TabRowDefaults.SecondaryIndicator(
+                            Modifier.tabIndicatorOffset(safeSelectedIndex),
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    },
+                    divider = {}
+                ) {
+                    tabs.forEachIndexed { index, tab ->
+                        Tab(
+                            selected = pagerState.currentPage == index,
+                            onClick = {
+                                coroutineScope.launch {
+                                    pagerState.animateScrollToPage(index)
+                                }
+                            },
+                            text = { 
+                                val title = when (tab) {
+                                    is MainTab.Local -> stringResource(R.string.action_local)
+                                    is MainTab.Filter -> tab.label.ifBlank { "..." }
+                                }
+                                
+                                Text(
+                                    text = title,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                    style = MaterialTheme.typography.labelLarge
+                                )
+                            }
+                        )
+                    }
+                }
+            } else {
+                Spacer(modifier = Modifier.weight(1f))
             }
 
             if (filterState.tabs.size < 5) {

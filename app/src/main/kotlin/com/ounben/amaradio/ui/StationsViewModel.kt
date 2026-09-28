@@ -19,6 +19,7 @@ import androidx.preference.PreferenceManager
 import android.content.SharedPreferences
 import com.ounben.amaradio.database.AMARadioDatabase
 import com.ounben.amaradio.database.toDataStation
+import java.net.URLDecoder
 import java.net.URLEncoder
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -118,6 +119,16 @@ class StationsViewModel(application: Application) : AndroidViewModel(application
                 val tagQuery = java.net.URLDecoder.decode(url.substringAfter("bytagexact/"), "UTF-8")
                 val localStations = withContext(Dispatchers.IO) {
                     AMARadioDatabase.getDatabase(app).stationDao().getStationsFiltered(null, null, null, null, null, tagQuery, "Name", 0)
+                }
+                if (localStations.isNotEmpty()) {
+                    val decoded = localStations.map { it.toDataStation() }
+                    _uiState.update { it.copy(stations = decoded, filteredStations = decoded, isLoading = false) }
+                    localDataFound = true
+                }
+            } else if (url.startsWith("json/stations/bylanguageexact/")) {
+                val langQuery = URLDecoder.decode(url.substringAfter("bylanguageexact/"), "UTF-8")
+                val localStations = withContext(Dispatchers.IO) {
+                    AMARadioDatabase.getDatabase(app).stationDao().getStationsFiltered(null, null, null, null, langQuery, null, "Name", 0)
                 }
                 if (localStations.isNotEmpty()) {
                     val decoded = localStations.map { it.toDataStation() }
