@@ -532,13 +532,14 @@ fun SearchableSelectionDialog(
         if (q.isEmpty()) {
             options
         } else {
-            // Erst filtern (muss vorkommen), dann nach dem neuen gewichteten Score sortieren
+            // Erst filtern, dann Score genau 1x pro Element berechnen und sortieren (verhindert 150.000x Rechen-Schleife)
             options.filter { it.label.contains(q, ignoreCase = true) }
+                .map { item -> item to SearchUtils.calculateScore(item.label, q) }
                 .sortedWith(
-                    compareByDescending<FilterViewModel.CategoryItem> { item ->
-                        SearchUtils.calculateScore(item.label, q)
-                    }.thenByDescending { it.count }
+                    compareByDescending<Pair<FilterViewModel.CategoryItem, Double>> { it.second }
+                        .thenByDescending { it.first.count }
                 )
+                .map { it.first }
         }
     }
 

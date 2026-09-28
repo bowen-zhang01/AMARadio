@@ -1,6 +1,9 @@
 package com.ounben.amaradio.ui
 
 object SearchUtils {
+    private val WORD_SPLIT_REGEX = Regex("""[\s\-_.\(\)/\[\]!?]+""")
+    private val SPACE_SPLIT_REGEX = Regex("""\s+""")
+
     /**
      * Calculates a relevance score for a target name based on multiple query words.
      * Prioritizes word starts and exact matches.
@@ -8,7 +11,7 @@ object SearchUtils {
     fun calculateMultiWordScore(targetName: String, queryWords: List<String>): Double {
         if (queryWords.isEmpty()) return 0.0
         val name = targetName.lowercase().trim()
-        val wordsInName = name.split(Regex("""[\s\-_.\(\)/\[\]!?]+""")).filter { it.isNotEmpty() }
+        val wordsInName = name.split(WORD_SPLIT_REGEX).filter { it.isNotEmpty() }
         
         var totalScore = 0.0
 
@@ -49,7 +52,7 @@ object SearchUtils {
 
     /** Legacy support for single string queries */
     fun calculateScore(targetName: String, query: String): Double {
-        val words = query.split(Regex("\\s+")).filter { it.isNotBlank() }
+        val words = query.split(SPACE_SPLIT_REGEX).filter { it.isNotBlank() }
         return calculateMultiWordScore(targetName, words)
     }
 }
