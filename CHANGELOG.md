@@ -5,6 +5,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+## [1.39] - 2026-09-27
+### Fixed
+- **Country Code Fallback & Offline Resilience**: Implemented a local database fallback to `US` when a device's detected country code is missing or invalid (e.g. `XU`), preventing empty screens and eliminating unnecessary online API calls.
+- **TabRow Crash Safeguard**: Ensured the main tab screen always maintains a valid local tab state, eliminating potential `IndexOutOfBoundsException` layout crashes in Compose `ScrollableTabRow`.
+
 ## [1.38] - 2026-09-27
 ### Changed
 - **Dependencies Updated**: Updated `androidx.navigation:navigation-compose` to `2.10.2`, `androidx.work:work-runtime-ktx` to `2.12.0`, and Gradle build tools to `9.4.1`.
