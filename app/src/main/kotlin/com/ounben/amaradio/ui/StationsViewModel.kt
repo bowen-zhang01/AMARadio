@@ -82,8 +82,14 @@ class StationsViewModel(application: Application) : AndroidViewModel(application
             
             if (url.startsWith("json/stations/bycountrycodeexact/")) {
                 val countryCode = url.substringAfter("bycountrycodeexact/").substringBefore("?").uppercase()
-                val localStations = withContext(Dispatchers.IO) {
+                var localStations = withContext(Dispatchers.IO) {
                     AMARadioDatabase.getDatabase(app).stationDao().getStationsByCountryCode(countryCode)
+                }
+                // Fallback: If country code (e.g. "XU") has 0 stations in DB, fall back to "US"
+                if (localStations.isEmpty() && countryCode != "US") {
+                    localStations = withContext(Dispatchers.IO) {
+                        AMARadioDatabase.getDatabase(app).stationDao().getStationsByCountryCode("US")
+                    }
                 }
                 if (localStations.isNotEmpty()) {
                     val decoded = localStations.map { it.toDataStation() }
