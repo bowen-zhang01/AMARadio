@@ -5,6 +5,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+## [1.40] - 2026-09-27
+### Changed
+- **Privacy & Storage Modernization**: Removed deprecated `WRITE_EXTERNAL_STORAGE` permission requirement from `AndroidManifest.xml` in favor of full Storage Access Framework (SAF) integration for playlist import/export.
+
+### Fixed
+- **Filter Dialog Performance & ANR Fix**: Optimized search sorting in `SearchableSelectionDialog` for `TagCache` and categories by pre-computing item relevance scores prior to sorting, eliminating CPU freezes on large datasets.
+
 ## [1.39] - 2026-09-27
 ### Fixed
 - **Country Code Fallback & Offline Resilience**: Implemented a local database fallback to `US` when a device's detected country code is missing or invalid (e.g. `XU`), preventing empty screens and eliminating unnecessary online API calls.
