@@ -37,7 +37,7 @@ fi
 
 apk=$(ls app/build/outputs/apk/foss/release/*.apk | head -n 1)
 version=$(sed -n 's/.*"versionName" *: *"\([^"]*\)".*/\1/p' app/build/outputs/apk/foss/release/output-metadata.json | head -n 1)
-out="build-release/AMARadio-${version}.apk"
+out="build-release/Xiangyin-${version}.apk"
 mkdir -p build-release
 cp "$apk" "$out"
 
@@ -50,6 +50,6 @@ if $publish; then
   gh release create "$tag" "$out" \
     --repo bowen-zhang01/AMARadio \
     --target "$(git rev-parse HEAD)" \
-    --title "AMARadio ${version}" \
+    --title "Xiangyin 乡音 ${version}" \
     --notes-file <(awk -v v="### ${version}" '$0 == v {f=1; next} /^#{2,3} / {f=0} f' FORK.md)
 fi
