@@ -3,6 +3,17 @@ package com.ounben.amaradio.fork.ui
 import android.text.format.DateUtils
 import android.widget.Toast
 import androidx.compose.foundation.background
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.filled.GraphicEq
+import androidx.compose.material3.Surface
+import androidx.compose.material3.carousel.HorizontalMultiBrowseCarousel
+import androidx.compose.material3.carousel.rememberCarouselState
+import androidx.compose.ui.graphics.RectangleShape
+import com.ounben.amaradio.ui.LocalPlayingStationUuid
+import com.ounben.amaradio.ui.StationIcon
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -19,6 +30,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
@@ -76,8 +88,8 @@ import com.ounben.amaradio.ui.StationOptionsDialog
 private val ScreenPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 24.dp)
 
 /**
- * Home tab: the bundled Beijing + national playlist first, then entry points to the larger
- * community playlists.
+ * Home tab: a greeting, the bundled playlist as sections (first group as a carousel), the
+ * most-played stations worldwide, and entry points to the larger community playlists.
  */
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -85,52 +97,86 @@ fun HomeScreen(
     viewModel: CuratedViewModel,
     onStationClick: (DataRadioStation) -> Unit,
     isFavorite: (String) -> Boolean,
-    onOpenPlaylist: (CuratedSource) -> Unit
+    onOpenPlaylist: (CuratedSource) -> Unit,
+    onBrowseAll: () -> Unit
 ) {
     val sources by viewModel.sources.collectAsState()
+    val popular by viewModel.popular.collectAsState()
     val featured = sources[CuratedSources.beijingNational.id] ?: return
-    var selectedGroup by rememberSaveable { mutableStateOf<String?>(null) }
     var stationWithOptions by remember { mutableStateOf<DataRadioStation?>(null) }
-    val context = LocalContext.current
+    val playlist = featured.playlist
+    // Groups of the bundled list in order, without the backup streams.
+    val sections = remember(playlist) {
+        playlist?.primaryStations.orEmpty().groupBy { it.TagsAll }.toList()
+    }
 
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
-        contentPadding = ScreenPadding,
-        verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap)
+        contentPadding = PaddingValues(bottom = 24.dp)
     ) {
-        item(key = "featured-header") {
-            PlaylistHeader(
-                state = featured,
-                onAddAll = {
-                    val added = viewModel.addAllToFavourites(featured.source)
-                    val message = if (added > 0) context.getString(R.string.fork_curated_added, added)
-                    else context.getString(R.string.fork_curated_nothing_added)
-                    Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
-                },
-                onRefresh = { viewModel.load(featured.source, forceRefresh = true) }
-            )
-        }
-        playlistBody(
-            state = featured,
-            selectedGroup = selectedGroup,
-            onGroupSelected = { selectedGroup = it },
-            onStationClick = onStationClick,
-            onFavoriteClick = { viewModel.toggleFavourite(it) },
-            onLongClick = { stationWithOptions = it },
-            isFavorite = isFavorite,
-            onRetry = { viewModel.load(featured.source, forceRefresh = true) }
-        )
+        item(key = "greeting") { HomeGreeting() }
 
-        item(key = "more-header") {
-            Text(
-                text = stringResource(R.string.fork_curated_more),
-                style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.padding(top = 28.dp, bottom = 8.dp, start = 4.dp)
+        if (playlist == null) {
+            playlistBody(
+                state = featured,
+                selectedGroup = null,
+                onGroupSelected = {},
+                onStationClick = onStationClick,
+                onFavoriteClick = { viewModel.toggleFavourite(it) },
+                onLongClick = { stationWithOptions = it },
+                isFavorite = isFavorite,
+                onRetry = { viewModel.load(featured.source, forceRefresh = true) }
             )
         }
+
+        sections.forEachIndexed { sectionIndex, (group, stations) ->
+            item(key = "header-$group") {
+                SectionHeader(
+                    title = group,
+                    actionLabel = if (sectionIndex == 0) stringResource(R.string.fork_home_see_all) else null,
+                    onAction = { onOpenPlaylist(CuratedSources.beijingNational) }
+                )
+            }
+            if (sectionIndex == 0) {
+                item(key = "carousel-$group") {
+                    StationCarousel(stations, onStationClick, onLongClick = { stationWithOptions = it })
+                }
+            } else {
+                itemsIndexed(stations, key = { _, station -> "home-${station.StationUuid}" }) { index, station ->
+                    Box(modifier = Modifier.padding(horizontal = 16.dp).padding(bottom = ListItemDefaults.SegmentedGap)) {
+                        StationListItem(
+                            station = station,
+                            isFavorite = isFavorite(station.StationUuid),
+                            onClick = { onStationClick(station) },
+                            onFavoriteClick = { viewModel.toggleFavourite(station) },
+                            onLongClick = { stationWithOptions = station },
+                            index = index,
+                            count = stations.size
+                        )
+                    }
+                }
+            }
+        }
+
+        if (popular.isNotEmpty()) {
+            item(key = "popular-header") {
+                SectionHeader(
+                    title = stringResource(R.string.fork_home_popular),
+                    actionLabel = stringResource(R.string.fork_home_browse_more),
+                    onAction = onBrowseAll
+                )
+            }
+            item(key = "popular-row") {
+                StationTileRow(popular, onStationClick, onLongClick = { stationWithOptions = it })
+            }
+        }
+
+        item(key = "more-header") { SectionHeader(title = stringResource(R.string.fork_curated_more)) }
         CuratedSources.all.filterNot { it.isBundled }.forEach { source ->
             item(key = "card-${source.id}") {
-                PlaylistCard(state = sources[source.id] ?: CuratedSourceState(source), onClick = { onOpenPlaylist(source) })
+                Box(modifier = Modifier.padding(horizontal = 16.dp)) {
+                    PlaylistCard(state = sources[source.id] ?: CuratedSourceState(source), onClick = { onOpenPlaylist(source) })
+                }
             }
         }
     }
@@ -142,6 +188,129 @@ fun HomeScreen(
             onFavoriteClick = { viewModel.toggleFavourite(station) },
             onDismiss = { stationWithOptions = null }
         )
+    }
+}
+
+@Composable
+private fun HomeGreeting() {
+    val hour = remember { java.util.Calendar.getInstance().get(java.util.Calendar.HOUR_OF_DAY) }
+    val greeting = when (hour) {
+        in 5..10 -> R.string.fork_greeting_morning
+        in 11..17 -> R.string.fork_greeting_afternoon
+        in 18..22 -> R.string.fork_greeting_evening
+        else -> R.string.fork_greeting_night
+    }
+    Column(modifier = Modifier.fillMaxWidth().padding(start = 20.dp, end = 20.dp, top = 12.dp, bottom = 4.dp)) {
+        Text(stringResource(greeting), style = MaterialTheme.typography.headlineLarge)
+        Text(
+            text = stringResource(R.string.fork_tagline),
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
+}
+
+@Composable
+private fun SectionHeader(title: String, actionLabel: String? = null, onAction: () -> Unit = {}) {
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(start = 20.dp, end = 8.dp, top = 24.dp, bottom = 8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(title, style = MaterialTheme.typography.titleLarge, modifier = Modifier.weight(1f))
+        if (actionLabel != null) {
+            TextButton(onClick = onAction) { Text(actionLabel) }
+        }
+    }
+}
+
+@Composable
+private fun NowPlayingBadge(modifier: Modifier = Modifier) {
+    Surface(
+        modifier = modifier,
+        shape = CircleShape,
+        color = MaterialTheme.colorScheme.surfaceContainerHighest.copy(alpha = 0.92f)
+    ) {
+        Row(modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp), verticalAlignment = Alignment.CenterVertically) {
+            Icon(Icons.Filled.GraphicEq, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(16.dp))
+            Spacer(Modifier.width(4.dp))
+            Text(stringResource(R.string.fork_now_playing), style = MaterialTheme.typography.labelMedium)
+        }
+    }
+}
+
+/** Material 3 multi-browse carousel of large station artwork. */
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+@Composable
+private fun StationCarousel(
+    stations: List<DataRadioStation>,
+    onStationClick: (DataRadioStation) -> Unit,
+    onLongClick: (DataRadioStation) -> Unit
+) {
+    val playing = LocalPlayingStationUuid.current
+    HorizontalMultiBrowseCarousel(
+        state = rememberCarouselState { stations.size },
+        preferredItemWidth = 176.dp,
+        itemSpacing = 8.dp,
+        contentPadding = PaddingValues(horizontal = 16.dp),
+        modifier = Modifier.fillMaxWidth().height(204.dp)
+    ) { index ->
+        val station = stations[index]
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .maskClip(MaterialTheme.shapes.extraLarge)
+                .combinedClickable(onClick = { onStationClick(station) }, onLongClick = { onLongClick(station) })
+        ) {
+            StationIcon(
+                stationName = station.Name,
+                stationUuid = station.StationUuid,
+                iconUrl = station.IconUrl,
+                modifier = Modifier.fillMaxSize(),
+                shape = RectangleShape
+            )
+            if (station.StationUuid == playing) {
+                NowPlayingBadge(modifier = Modifier.align(Alignment.BottomStart).padding(12.dp))
+            }
+        }
+    }
+}
+
+/** Horizontally scrolling station tiles (logo and name). */
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+private fun StationTileRow(
+    stations: List<DataRadioStation>,
+    onStationClick: (DataRadioStation) -> Unit,
+    onLongClick: (DataRadioStation) -> Unit
+) {
+    LazyRow(
+        contentPadding = PaddingValues(horizontal = 16.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        items(stations, key = { "tile-${it.StationUuid}" }) { station ->
+            Column(
+                modifier = Modifier
+                    .width(112.dp)
+                    .clip(MaterialTheme.shapes.large)
+                    .combinedClickable(onClick = { onStationClick(station) }, onLongClick = { onLongClick(station) })
+            ) {
+                StationIcon(
+                    stationName = station.Name,
+                    stationUuid = station.StationUuid,
+                    iconUrl = station.IconUrl,
+                    modifier = Modifier.size(112.dp),
+                    shape = MaterialTheme.shapes.large
+                )
+                Spacer(Modifier.height(6.dp))
+                Text(
+                    text = station.Name,
+                    style = MaterialTheme.typography.labelLarge,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.padding(horizontal = 2.dp)
+                )
+            }
+        }
     }
 }
 

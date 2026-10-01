@@ -54,4 +54,12 @@
     <string name="fork_about_notice">This is a modified version of AMARadio by ounben, maintained at github.com/bowen-zhang01/AMARadio since 1 October 2026. It adds curated Chinese playlists and a Material 3 Expressive interface, and follows upstream releases.</string>
     <string name="fork_about_fork_repo">Fork source code</string>
     <string name="fork_about_upstream_repo">Original AMARadio</string>
+    <string name="fork_home_see_all">See all</string>
+    <string name="fork_home_popular">Popular worldwide</string>
+    <string name="fork_home_browse_more">Browse</string>
+    <string name="fork_now_playing">Now playing</string>
+    <string name="fork_greeting_morning">Good morning</string>
+    <string name="fork_greeting_afternoon">Good afternoon</string>
+    <string name="fork_greeting_evening">Good evening</string>
+    <string name="fork_greeting_night">Late night radio</string>
 </resources>

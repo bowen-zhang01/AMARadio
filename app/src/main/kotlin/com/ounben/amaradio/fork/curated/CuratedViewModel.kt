@@ -6,6 +6,8 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.preference.PreferenceManager
 import com.ounben.amaradio.AMARadioApp
+import com.ounben.amaradio.database.AMARadioDatabase
+import com.ounben.amaradio.database.toDataStation
 import com.ounben.amaradio.database.user.AMARadioUserDatabase
 import com.ounben.amaradio.station.DataRadioStation
 import kotlinx.coroutines.Dispatchers
@@ -31,9 +33,27 @@ class CuratedViewModel(application: Application) : AndroidViewModel(application)
     private val _sources = MutableStateFlow(CuratedSources.all.associate { it.id to CuratedSourceState(it) })
     val sources: StateFlow<Map<String, CuratedSourceState>> = _sources.asStateFlow()
 
+    /** Most-played stations outside China in the local radio-browser catalog. */
+    private val _popular = MutableStateFlow<List<DataRadioStation>>(emptyList())
+    val popular: StateFlow<List<DataRadioStation>> = _popular.asStateFlow()
+
     init {
         viewModelScope.launch { seedFavouritesOnFirstRun() }
+        viewModelScope.launch { _popular.value = loadPopularWorldwide() }
         load(CuratedSources.beijingNational)
+    }
+
+    private suspend fun loadPopularWorldwide(): List<DataRadioStation> = withContext(Dispatchers.IO) {
+        runCatching {
+            AMARadioDatabase.getDatabase(app).stationDao()
+                .getStationsFiltered(null, null, null, null, null, null, "clickcount", 1)
+                .asSequence()
+                .map { it.toDataStation() }
+                .filter { it.CountryCode != "CN" && it.IconUrl.startsWith("http") }
+                .distinctBy { it.Name.trim().lowercase() }
+                .take(POPULAR_COUNT)
+                .toList()
+        }.getOrDefault(emptyList())
     }
 
     fun load(source: CuratedSource, forceRefresh: Boolean = false) {
@@ -41,6 +61,11 @@ class CuratedViewModel(application: Application) : AndroidViewModel(application)
         if (current.isLoading || (!forceRefresh && current.playlist != null)) return
         updateSource(source.id) { it.copy(isLoading = true, error = null) }
         viewModelScope.launch {
+            // Show the copy shipped in the APK at once; the refresh below replaces it if newer.
+            if (current.playlist == null && source.isBundled) {
+                val bundled = withContext(Dispatchers.IO) { runCatching { repository.loadBundled(source) }.getOrNull() }
+                if (bundled != null) updateSource(source.id) { it.copy(playlist = bundled) }
+            }
             repository.load(source, forceRefresh)
                 .onSuccess { playlist -> updateSource(source.id) { it.copy(playlist = playlist, isLoading = false) } }
                 .onFailure { e -> updateSource(source.id) { it.copy(isLoading = false, error = e.message ?: e.javaClass.simpleName) } }
@@ -83,5 +108,6 @@ class CuratedViewModel(application: Application) : AndroidViewModel(application)
 
     companion object {
         private const val PREF_FAVOURITES_SEEDED = "fork_curated_favourites_seeded_v1"
+        private const val POPULAR_COUNT = 16
     }
 }

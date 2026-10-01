@@ -52,4 +52,12 @@
     <string name="fork_about_notice">这是 ounben 开发的 AMARadio 的修改版，自 2026 年 10 月 1 日起在 github.com/bowen-zhang01/AMARadio 维护，增加了中文精选歌单和 Material 3 Expressive 界面，并持续跟进原版更新。</string>
     <string name="fork_about_fork_repo">分支源代码</string>
     <string name="fork_about_upstream_repo">原版 AMARadio</string>
+    <string name="fork_home_see_all">全部</string>
+    <string name="fork_home_popular">全球热门</string>
+    <string name="fork_home_browse_more">发现更多</string>
+    <string name="fork_now_playing">正在播放</string>
+    <string name="fork_greeting_morning">早上好</string>
+    <string name="fork_greeting_afternoon">下午好</string>
+    <string name="fork_greeting_evening">晚上好</string>
+    <string name="fork_greeting_night">夜深了</string>
 </resources>

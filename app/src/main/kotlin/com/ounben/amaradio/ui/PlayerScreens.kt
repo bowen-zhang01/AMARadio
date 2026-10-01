@@ -55,6 +55,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -108,8 +109,8 @@ fun MiniPlayer(
                 onDragStopped = { velocity -> if (velocity < -300f) onToggleBottomSheet() }
             ),
         shape = MaterialTheme.shapes.extraLarge,
-        color = MaterialTheme.colorScheme.secondaryContainer,
-        contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+        color = MaterialTheme.colorScheme.surfaceContainerHighest,
+        contentColor = MaterialTheme.colorScheme.onSurface,
         shadowElevation = 3.dp
     ) {
         Column {
@@ -142,7 +143,7 @@ fun MiniPlayer(
                         },
                         style = MaterialTheme.typography.bodySmall,
                         color = if (uiState.playState == PlayState.Error) MaterialTheme.colorScheme.error
-                        else MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.8f),
+                        else MaterialTheme.colorScheme.onSurfaceVariant,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -212,6 +213,8 @@ private fun PlayerArtwork(
     var frozenAngle by remember { mutableStateOf(0f) }
     if (isPlaying) frozenAngle = angle
 
+    // Bundled station artwork fills the cookie; the outline turns, the artwork stays upright.
+    val isArtwork = iconUrl?.contains("/curated_logos/") == true
     Box(modifier = modifier, contentAlignment = Alignment.Center) {
         Box(
             modifier = Modifier
@@ -219,14 +222,26 @@ private fun PlayerArtwork(
                 .graphicsLayer { rotationZ = frozenAngle }
                 .clip(cookie)
                 .background(MaterialTheme.colorScheme.primaryContainer)
-        )
-        StationIcon(
-            stationName = stationName,
-            stationUuid = stationUuid,
-            iconUrl = iconUrl,
-            modifier = Modifier.fillMaxSize(0.62f),
-            shape = CircleShape
-        )
+        ) {
+            if (isArtwork) {
+                StationIcon(
+                    stationName = stationName,
+                    stationUuid = stationUuid,
+                    iconUrl = iconUrl,
+                    modifier = Modifier.fillMaxSize().graphicsLayer { rotationZ = -frozenAngle },
+                    shape = RectangleShape
+                )
+            }
+        }
+        if (!isArtwork) {
+            StationIcon(
+                stationName = stationName,
+                stationUuid = stationUuid,
+                iconUrl = iconUrl,
+                modifier = Modifier.fillMaxSize(0.62f),
+                shape = CircleShape
+            )
+        }
     }
 }
 

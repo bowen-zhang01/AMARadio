@@ -70,6 +70,7 @@ import com.ounben.amaradio.fork.curated.CuratedSources
 import com.ounben.amaradio.fork.curated.CuratedViewModel
 import com.ounben.amaradio.fork.ui.CuratedPlaylistScreen
 import com.ounben.amaradio.fork.ui.HomeScreen
+import com.ounben.amaradio.fork.ui.rememberArtworkColorScheme
 import com.ounben.amaradio.history.TrackHistoryViewModel
 import com.ounben.amaradio.station.DataRadioStation
 import kotlinx.coroutines.launch
@@ -209,6 +210,10 @@ fun MainScreen(
         onDeleteClick = deleteTarget?.let { target -> { showDeleteConfirmDialog = target } }
     )
 
+    // The player surfaces take their colors from the current station's artwork.
+    val artworkScheme = rememberArtworkColorScheme(playerUiState.currentStation?.IconUrl)
+    val playerColorScheme = artworkScheme ?: MaterialTheme.colorScheme
+
     CompositionLocalProvider(LocalPlayingStationUuid provides playerUiState.currentStation?.StationUuid) {
         Scaffold(
             topBar = {
@@ -234,10 +239,12 @@ fun MainScreen(
                         enter = expandVertically() + fadeIn(),
                         exit = shrinkVertically() + fadeOut()
                     ) {
-                        MiniPlayer(
-                            viewModel = playerViewModel,
-                            onToggleBottomSheet = { showFullPlayer = true }
-                        )
+                        MaterialTheme(colorScheme = playerColorScheme) {
+                            MiniPlayer(
+                                viewModel = playerViewModel,
+                                onToggleBottomSheet = { showFullPlayer = true }
+                            )
+                        }
                     }
                     ShortNavigationBar {
                         topLevelScreens.forEach { screen ->
@@ -276,7 +283,15 @@ fun MainScreen(
                             viewModel = curatedViewModel,
                             onStationClick = playStation,
                             isFavorite = isFavourite,
-                            onOpenPlaylist = { source -> navController.navigate(Screen.Playlist.routeFor(source.id)) }
+                            onOpenPlaylist = { source -> navController.navigate(Screen.Playlist.routeFor(source.id)) },
+                            onBrowseAll = {
+                                mainViewModel.setStationsInitialTab(0)
+                                navController.navigate(Screen.Stations.route) {
+                                    popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                                    launchSingleTop = true
+                                    restoreState = true
+                                }
+                            }
                         )
                     }
                     composable(Screen.Playlist.route) { entry ->
@@ -381,7 +396,7 @@ fun MainScreen(
             }
         }
 
-        if (showFullPlayer && playerUiState.currentStation != null) {
+        if (showFullPlayer && playerUiState.currentStation != null) MaterialTheme(colorScheme = playerColorScheme) {
             ModalBottomSheet(
                 onDismissRequest = { showFullPlayer = false },
                 sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
