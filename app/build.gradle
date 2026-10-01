@@ -227,3 +227,5 @@ dependencies {
     testRuntimeOnly libs.junit.vintage.engine
     testRuntimeOnly libs.junit.platform.launcher
 }
+
+apply from: 'fork.gradle'

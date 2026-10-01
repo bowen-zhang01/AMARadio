@@ -44,7 +44,7 @@ class AMARadioFullWidget : GlanceAppWidget() {
             val playingUuid = (prefs[WidgetState.stationUuidKey] ?: "").toString()
             val playingIconUrl = (prefs[WidgetState.stationIconUrlKey] ?: "").toString()
             val isPlaying = prefs[WidgetState.isPlayingKey] ?: false
-            val currentName = (prefs[WidgetState.stationNameKey] ?: context.getString(R.string.app_name)).toString()
+            val currentName = (prefs[WidgetState.stationNameKey] ?: context.getString(R.string.fork_app_name)).toString()
             val currentDetails = (prefs[WidgetState.stationDetailsKey] ?: "").toString()
             val currentTrack = (prefs[WidgetState.currentTrackKey] ?: "").toString()
             

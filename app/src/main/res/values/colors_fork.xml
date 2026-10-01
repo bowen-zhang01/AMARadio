@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Xiangyin brand: night sky behind the amber moon of the launcher icon. -->
+    <color name="fork_brand_night">#151A40</color>
+    <color name="fork_brand_moon">#FF9F1C</color>
+</resources>

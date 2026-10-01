@@ -39,6 +39,9 @@ class IcyDataSource(
     }
 
     private var dataSpec: DataSpec? = null
+    // Final URL after OkHttp followed redirects. HLS resolves relative playlist and segment
+    // URIs against getUri(), so it must not report the pre-redirect URL.
+    private var responseUri: Uri? = null
     private var responseBody: ResponseBody? = null
     private var byteStream: InputStream? = null
     private var responseHeaders: Map<String, List<String>> = HashMap()
@@ -115,6 +118,7 @@ class IcyDataSource(
             throw HttpDataSource.InvalidResponseCodeException(code, null, null, headers, dataSpec!!, ByteArray(0))
         }
 
+        responseUri = Uri.parse(response.request.url.toString())
         responseBody = response.body
         // NO EXTRA BUFFER: Use the direct stream. OkHttp is already efficient.
         // This removes the potential "waiting for buffer to fill" delay at start.
@@ -149,6 +153,7 @@ class IcyDataSource(
         opened = false
         activeCall?.cancel()
         activeCall = null
+        responseUri = null
 
         dataSpec?.let { 
              try { transferListener.onTransferEnd(this, it, true) } catch(_: Exception) {}
@@ -258,7 +263,7 @@ class IcyDataSource(
         }
     }
 
-    override fun getUri(): Uri? = dataSpec?.uri
+    override fun getUri(): Uri? = responseUri ?: dataSpec?.uri
 
     override fun setRequestProperty(name: String, value: String) {
         synchronized(requestProperties) {

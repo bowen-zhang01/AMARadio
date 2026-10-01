@@ -81,7 +81,7 @@ fun TabsScreen(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.secondary),
+                .background(MaterialTheme.colorScheme.surface),
             verticalAlignment = Alignment.CenterVertically
         ) {
             if (tabs.isNotEmpty()) {
@@ -94,7 +94,7 @@ fun TabsScreen(
                     modifier = Modifier.weight(1f),
                     edgePadding = 16.dp,
                     containerColor = Color.Transparent,
-                    contentColor = MaterialTheme.colorScheme.onSecondary,
+                    contentColor = MaterialTheme.colorScheme.onSurface,
                     indicator = {
                         TabRowDefaults.SecondaryIndicator(
                             Modifier.tabIndicatorOffset(safeSelectedIndex),
@@ -135,7 +135,7 @@ fun TabsScreen(
                 Icon(
                     imageVector = Icons.Default.Add,
                     contentDescription = stringResource(R.string.accessibility_add_filter),
-                    tint = AmaradioAmber,
+                    tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier
                         .clickable { filterViewModel.addTab() }
                         .padding(16.dp)

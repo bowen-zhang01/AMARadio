@@ -20,6 +20,7 @@ import androidx.media3.datasource.TransferListener
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.DefaultLoadControl
 import androidx.media3.exoplayer.hls.HlsMediaSource
+import androidx.media3.exoplayer.source.UnrecognizedInputFormatException
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import androidx.media3.exoplayer.source.MediaSource
 import androidx.media3.exoplayer.source.ProgressiveMediaSource
@@ -49,6 +50,10 @@ class ExoPlayerWrapper(private val context: Context, looper: Looper) : PlayerWra
         get() = bytesTransferred
     
     private var isHls = false
+    // Stream that failed as a progressive download and is being retried as HLS
+    // (HLS playlists served from URLs without a ".m3u8" suffix).
+    private var hlsRetryUrl: String? = null
+    private var lastPlayRequest: Triple<OkHttpClient, Context, MediaMetadata?>? = null
     private var isPlayingFlag = false
     private val playerThreadHandler = Handler(looper)
     private var audioSource: MediaSource? = null
@@ -116,7 +121,9 @@ class ExoPlayerWrapper(private val context: Context, looper: Looper) : PlayerWra
         val attributedContext = Utils.getAttributedContext(context)
         this.streamUrl = streamUrl
         this.stationName = metadata?.station?.toString() ?: metadata?.title?.toString()
-        isHls = Utils.urlIndicatesHlsStream(streamUrl)
+        if (hlsRetryUrl != streamUrl) hlsRetryUrl = null
+        lastPlayRequest = Triple(httpClient, context, metadata)
+        isHls = hlsRetryUrl == streamUrl || Utils.urlIndicatesHlsStream(streamUrl)
         bytesTransferred = 0
         cancelStopTask()
 
@@ -295,6 +302,11 @@ class ExoPlayerWrapper(private val context: Context, looper: Looper) : PlayerWra
                 stateListener?.onPlayerError(R.string.error_play_stream)
                 return C.TIME_UNSET
             }
+            // No extractor understands the data (e.g. an HLS playlist fetched as a progressive
+            // stream). Retrying cannot help and only delays the HLS fallback in onPlayerError.
+            if (exception is UnrecognizedInputFormatException) {
+                return C.TIME_UNSET
+            }
             if (!Utils.hasAnyConnection(context)) {
                 val resumeWithinS = try { sharedPrefs.getInt("settings_resume_within", 60) } catch (_: Exception) { 60 }
                 if (resumeWithinS > 0) {
@@ -336,6 +348,18 @@ class ExoPlayerWrapper(private val context: Context, looper: Looper) : PlayerWra
         }
 
         override fun onPlayerError(error: PlaybackException) {
+            val url = streamUrl
+            val request = lastPlayRequest
+            val notAContainer = error.errorCode == PlaybackException.ERROR_CODE_PARSING_CONTAINER_UNSUPPORTED ||
+                error.errorCode == PlaybackException.ERROR_CODE_PARSING_CONTAINER_MALFORMED
+            if (notAContainer && !isHls && url != null && hlsRetryUrl != url && request != null) {
+                // The progressive extractors could not read the stream; it may be an HLS
+                // playlist behind a URL without ".m3u8". Retry once as HLS before failing.
+                Log.i("ExoPlayerWrapper", "Stream is not a progressive container, retrying as HLS: $url")
+                hlsRetryUrl = url
+                playRemote(request.first, url, request.second, request.third)
+                return
+            }
             val messageId = when (error.errorCode) {
                 PlaybackException.ERROR_CODE_IO_NETWORK_CONNECTION_FAILED,
                 PlaybackException.ERROR_CODE_IO_BAD_HTTP_STATUS,

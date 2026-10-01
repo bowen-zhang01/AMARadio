@@ -30,7 +30,7 @@ class AMARadioSmallWidget : GlanceAppWidget() {
     override suspend fun provideGlance(context: Context, id: GlanceId) {
         provideContent {
             val prefs = currentState<Preferences>()
-            val name = (prefs[WidgetState.stationNameKey] ?: context.getString(R.string.app_name)).toString()
+            val name = (prefs[WidgetState.stationNameKey] ?: context.getString(R.string.fork_app_name)).toString()
             val details = (prefs[WidgetState.stationDetailsKey] ?: "").toString()
             val trackInfo = (prefs[WidgetState.currentTrackKey] ?: "").toString()
             val uuid = (prefs[WidgetState.stationUuidKey] ?: "").toString()

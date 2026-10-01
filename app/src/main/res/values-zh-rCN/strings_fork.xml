@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="fork_app_name">乡音</string>
+    <string name="fork_tagline">海上生明月，天涯共此时</string>
+    <string name="fork_nav_home">精选</string>
+    <string name="fork_nav_browse">发现</string>
+
+    <string name="fork_startup_show_home">精选</string>
+    <string name="fork_search_hint">搜索电台</string>
+    <string name="fork_action_retry">重试</string>
+
+    <string name="fork_curated_beijing_title">北京与中央台</string>
+    <string name="fork_curated_beijing_desc">北京台、央广、国际台官方直播流，逐个验证过</string>
+    <string name="fork_curated_provincial_title">央广与各省台</string>
+    <string name="fork_curated_provincial_desc">按省份分组，由 huangsuming/iptv 维护</string>
+    <string name="fork_curated_china_title">中国电台（自动检测）</string>
+    <string name="fork_curated_china_desc">社区维护的列表，来自 junguler/m3u-radio-music-playlists</string>
+    <string name="fork_curated_more">更多歌单</string>
+    <string name="fork_curated_all">全部</string>
+    <string name="fork_curated_add_all">全部加入收藏</string>
+    <string name="fork_curated_added">已把 %1$d 个电台加入收藏</string>
+    <string name="fork_curated_nothing_added">这些电台都已经在收藏里了</string>
+    <string name="fork_curated_stations_count">%1$d 个电台</string>
+    <string name="fork_curated_updated">更新于 %1$s</string>
+    <string name="fork_curated_bundled">内置版本</string>
+    <string name="fork_curated_refresh">刷新</string>
+    <string name="fork_curated_load_failed">歌单加载失败</string>
+    <string name="fork_curated_source">来源</string>
+    <string name="fork_curated_downloaded_on_open">打开时从来源下载</string>
+
+    <string name="fork_player_live">直播</string>
+    <string name="fork_player_connecting">正在连接…</string>
+    <string name="fork_player_paused">已暂停</string>
+    <string name="fork_player_play">播放</string>
+    <string name="fork_player_pause">暂停</string>
+    <string name="fork_player_previous">上一个电台</string>
+    <string name="fork_player_next">下一个电台</string>
+    <string name="fork_player_favorite">收藏</string>
+    <string name="fork_player_sleep_timer">睡眠定时</string>
+    <string name="fork_player_expand">打开播放器</string>
+    <string name="fork_player_collapse">关闭播放器</string>
+
+    <string name="fork_empty_favorites">还没有收藏</string>
+    <string name="fork_empty_favorites_desc">点电台旁边的星标，就会出现在这里</string>
+
+    <string name="fork_settings_dynamic_color">动态取色</string>
+    <string name="fork_settings_dynamic_color_desc">使用壁纸的颜色（Android 12 及以上）</string>
+    <string name="fork_settings_pure_black">纯黑深色主题</string>
+    <string name="fork_settings_pure_black_desc">深色模式使用纯黑背景，OLED 屏幕更省电</string>
+
+    <string name="fork_about_title">关于这个分支</string>
+    <string name="fork_about_notice">这是 ounben 开发的 AMARadio 的修改版，自 2026 年 10 月 1 日起在 github.com/bowen-zhang01/AMARadio 维护，增加了中文精选歌单和 Material 3 Expressive 界面，并持续跟进原版更新。</string>
+    <string name="fork_about_fork_repo">分支源代码</string>
+    <string name="fork_about_upstream_repo">原版 AMARadio</string>
+    <string name="fork_home_see_all">全部</string>
+    <string name="fork_home_popular">全球热门</string>
+    <string name="fork_home_browse_more">发现更多</string>
+    <string name="fork_now_playing">正在播放</string>
+    <string name="fork_greeting_morning">早上好</string>
+    <string name="fork_greeting_afternoon">下午好</string>
+    <string name="fork_greeting_evening">晚上好</string>
+    <string name="fork_greeting_night">夜深了</string>
+</resources>

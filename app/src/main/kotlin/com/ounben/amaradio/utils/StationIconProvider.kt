@@ -15,7 +15,13 @@ import java.io.FileOutputStream
 class StationIconProvider : ContentProvider() {
 
     companion object {
-        const val AUTHORITY = "com.ounben.amaradio.stationicons"
+        private const val AUTHORITY_SUFFIX = ".stationicons"
+
+        // Derived from the installed package name (see onCreate) so that builds with a
+        // different applicationId do not collide with upstream on the provider authority.
+        @Volatile
+        var AUTHORITY: String = "com.ounben.amaradio$AUTHORITY_SUFFIX"
+            private set
         
         fun getIconUri(uuid: String, name: String, remoteUrl: String? = null): Uri {
             val builder = Uri.Builder()
@@ -35,7 +41,10 @@ class StationIconProvider : ContentProvider() {
         }
     }
 
-    override fun onCreate(): Boolean = true
+    override fun onCreate(): Boolean {
+        context?.packageName?.let { AUTHORITY = it + AUTHORITY_SUFFIX }
+        return true
+    }
 
     override fun openFile(uri: Uri, mode: String): ParcelFileDescriptor? {
         val stationUuid = uri.lastPathSegment ?: return null

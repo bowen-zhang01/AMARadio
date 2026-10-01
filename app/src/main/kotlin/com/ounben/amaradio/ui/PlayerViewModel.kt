@@ -102,16 +102,20 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
         if (bandwidthJob?.isActive == true) return
         lastBytes = PlayerServiceUtil.getTransferredBytes()
         bandwidthJob = viewModelScope.launch {
+            // HLS streams arrive in multi-second segments, so a per-second reading is mostly
+            // zero. Report a rolling average over the last few seconds instead.
+            val window = ArrayDeque<Long>()
             while (true) {
                 delay(1000)
                 val currentBytes = PlayerServiceUtil.getTransferredBytes()
-                val diff = currentBytes - lastBytes
+                val diff = (currentBytes - lastBytes).coerceAtLeast(0)
                 lastBytes = currentBytes
-                
-                val speedKBs = if (diff > 0) diff / 1024.0 else 0.0
-                val speedString = if (speedKBs > 0) "%.1f kB/s".format(speedKBs) else "0.0 kB/s"
-                
-                _bandwidth.value = speedString
+
+                window.addLast(diff)
+                if (window.size > BANDWIDTH_WINDOW_SECONDS) window.removeFirst()
+                val speedKBs = window.sum() / 1024.0 / window.size
+
+                _bandwidth.value = "%.1f kB/s".format(speedKBs)
             }
         }
     }
@@ -177,3 +181,4 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
     }
 }
 
+private const val BANDWIDTH_WINDOW_SECONDS = 10

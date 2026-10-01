@@ -72,7 +72,7 @@ fun FilterScreen(
                     role = Role.Button
                 },
             shape = RoundedCornerShape(12.dp),
-            color = MaterialTheme.colorScheme.surfaceVariant,
+            color = MaterialTheme.colorScheme.surfaceContainerHigh,
             tonalElevation = 0.dp
         ) {
             Row(
@@ -85,7 +85,7 @@ fun FilterScreen(
                         text = if (currentTab.label.isNotBlank()) currentTab.label else stringResource(R.string.action_filter),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
-                        color = if (currentTab.label.isNotBlank()) AmaradioAmber else MaterialTheme.colorScheme.onSurface,
+                        color = if (currentTab.label.isNotBlank()) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -98,7 +98,7 @@ fun FilterScreen(
                 Icon(
                     imageVector = Icons.Default.Tune,
                     contentDescription = stringResource(R.string.accessibility_configure),
-                    tint = AmaradioAmber
+                    tint = MaterialTheme.colorScheme.primary
                 )
             }
         }
@@ -151,7 +151,7 @@ fun FilterScreen(
                         fontWeight = FontWeight.Bold
                     )
                     IconButton(onClick = { showFilterSheet = false }) {
-                        Icon(Icons.Default.Close, contentDescription = stringResource(R.string.accessibility_close), tint = AmaradioAmber)
+                        Icon(Icons.Default.Close, contentDescription = stringResource(R.string.accessibility_close), tint = MaterialTheme.colorScheme.primary)
                     }
                 }
 
@@ -252,7 +252,7 @@ fun FilterScreen(
                         Icon(
                             imageVector = if (currentTab.reverse) Icons.Default.ArrowDownward else Icons.Default.ArrowUpward,
                             contentDescription = stringResource(R.string.accessibility_filter_reverse),
-                            tint = AmaradioAmber
+                            tint = MaterialTheme.colorScheme.primary
                         )
                     }
                 }
@@ -269,10 +269,9 @@ fun FilterScreen(
                         Button(
                             onClick = { showDeleteConfirm = true },
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = Color(0xFFB71C1C), // Solid Dark Red
-                                contentColor = Color.White
+                                containerColor = MaterialTheme.colorScheme.error,
+                                contentColor = MaterialTheme.colorScheme.onError
                             ),
-                            shape = RoundedCornerShape(8.dp)
                         ) {
                             Icon(Icons.Default.Delete, contentDescription = null, modifier = Modifier.size(18.dp))
                             Spacer(Modifier.width(8.dp))
@@ -292,10 +291,9 @@ fun FilterScreen(
                                 viewModel.performSearch(tabIndex) 
                             }
                         },
-                        shape = RoundedCornerShape(8.dp),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = AmaradioAmber, // Solid Amber
-                            contentColor = Color.Black
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            contentColor = MaterialTheme.colorScheme.onPrimary
                         )
                     ) {
                         Icon(Icons.Default.Check, contentDescription = null, modifier = Modifier.size(18.dp))
@@ -321,11 +319,7 @@ fun FilterScreen(
                         showDeleteConfirm = false
                         showFilterSheet = false
                     },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.White,
-                        contentColor = Color.Black
-                    ),
-                    shape = RoundedCornerShape(8.dp)
+                    colors = ButtonDefaults.filledTonalButtonColors(),
                 ) {
                     Text(stringResource(R.string.yes), fontWeight = FontWeight.Bold)
                 }
@@ -333,7 +327,7 @@ fun FilterScreen(
             dismissButton = {
                 TextButton(
                     onClick = { showDeleteConfirm = false },
-                    colors = ButtonDefaults.textButtonColors(contentColor = Color.White)
+                    colors = ButtonDefaults.textButtonColors()
                 ) {
                     Text(stringResource(R.string.no), fontWeight = FontWeight.Bold)
                 }
@@ -349,7 +343,7 @@ fun FilterEmptyState() {
             .fillMaxSize()
             .padding(horizontal = 32.dp)
             .verticalScroll(rememberScrollState())
-            .background(MaterialTheme.colorScheme.surfaceVariant),
+            .background(MaterialTheme.colorScheme.surfaceContainerHigh),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
@@ -357,7 +351,7 @@ fun FilterEmptyState() {
             imageVector = Icons.Default.Radio,
             contentDescription = null,
             modifier = Modifier.size(100.dp),
-            tint = AmaradioAmber
+            tint = MaterialTheme.colorScheme.primary
         )
         
         Spacer(modifier = Modifier.height(16.dp))
@@ -382,7 +376,7 @@ fun FilterEmptyState() {
         Spacer(modifier = Modifier.height(16.dp))
         
         Card(
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
             elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(12.dp)
@@ -442,7 +436,7 @@ fun CustomFilterField(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(44.dp)
-                .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(8.dp))
+                .background(MaterialTheme.colorScheme.surfaceContainerHigh, RoundedCornerShape(8.dp))
                 .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(8.dp))
                 .semantics(mergeDescendants = true) {
                     if (isReadOnly) {
@@ -563,12 +557,12 @@ fun SearchableSelectionDialog(
                     value = searchQuery,
                     onValueChange = { searchQuery = it },
                     placeholder = { Text(stringResource(R.string.searchpreference_search)) },
-                    leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = AmaradioAmber) },
+                    leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
                     modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp).focusRequester(focusRequester),
                     singleLine = true,
                     shape = RoundedCornerShape(8.dp),
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = AmaradioAmber,
+                        focusedBorderColor = MaterialTheme.colorScheme.primary,
                         unfocusedBorderColor = MaterialTheme.colorScheme.outline,
                         unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
                         focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant
@@ -641,7 +635,7 @@ fun SortField(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(44.dp)
-                .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(8.dp))
+                .background(MaterialTheme.colorScheme.surfaceContainerHigh, RoundedCornerShape(8.dp))
                 .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(8.dp))
                 .clickable { expanded = true }
                 .padding(horizontal = 8.dp)

@@ -1,0 +1,94 @@
+name: Upstream sync
+
+# Fork-only workflow: once a week, merge new commits from ounben/AMARadio into a
+# sync branch and open a pull request against master, so upstream updates can be
+# reviewed (and the redesign adjusted) before they land. Merge conflicts are left
+# in an issue for manual resolution instead of being committed.
+
+on:
+  schedule:
+    - cron: "0 3 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout fork
+        uses: actions/checkout@v4
+        with:
+          ref: master
+          fetch-depth: 0
+          lfs: false
+
+      - name: Fetch upstream
+        run: |
+          git remote add upstream https://github.com/ounben/AMARadio.git
+          git fetch --no-tags upstream master
+
+      - name: Check for new upstream commits
+        id: check
+        run: |
+          count=$(git rev-list --count master..upstream/master)
+          echo "count=$count" >> "$GITHUB_OUTPUT"
+          echo "upstream_head=$(git rev-parse --short upstream/master)" >> "$GITHUB_OUTPUT"
+          echo "New upstream commits: $count"
+
+      - name: Merge upstream into a sync branch
+        id: merge
+        if: steps.check.outputs.count != '0'
+        env:
+          GIT_LFS_SKIP_SMUDGE: "1"
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          # LFS objects (the prebuilt station database) are not downloaded here.
+          git config lfs.allowincompletepush true
+          branch="sync/upstream-${{ steps.check.outputs.upstream_head }}"
+          echo "branch=$branch" >> "$GITHUB_OUTPUT"
+          if git ls-remote --exit-code --heads origin "$branch" >/dev/null; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          git checkout -b "$branch"
+          if git merge --no-edit upstream/master; then
+            echo "conflict=false" >> "$GITHUB_OUTPUT"
+            git push origin "$branch"
+          else
+            echo "conflict=true" >> "$GITHUB_OUTPUT"
+            git diff --name-only --diff-filter=U > conflicts.txt
+            git merge --abort
+          fi
+
+      - name: Open pull request
+        if: steps.merge.outputs.conflict == 'false' && steps.merge.outputs.exists != 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh pr create \
+            --base master \
+            --head "${{ steps.merge.outputs.branch }}" \
+            --title "Merge upstream AMARadio (${{ steps.check.outputs.count }} commits, ${{ steps.check.outputs.upstream_head }})" \
+            --body "Automated merge of ounben/AMARadio master. Review UI changes against the redesign (see FORK.md) and run the app before merging."
+
+      - name: Report merge conflict
+        if: steps.merge.outputs.conflict == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          title="Upstream merge conflict at ${{ steps.check.outputs.upstream_head }}"
+          if gh issue list --state open --search "in:title \"$title\"" --json number --jq 'length' | grep -q '^0$'; then
+            {
+              echo "Merging ounben/AMARadio master (${{ steps.check.outputs.count }} new commits) conflicts in:"
+              echo
+              sed 's/^/- /' conflicts.txt
+              echo
+              echo "Resolve locally as described in FORK.md (Syncing upstream)."
+            } > body.md
+            gh issue create --title "$title" --body-file body.md
+          fi

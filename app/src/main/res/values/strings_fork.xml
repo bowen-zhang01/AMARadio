@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Strings added by the bowen-zhang01/AMARadio fork. Kept apart from strings.xml so that
+     upstream translation updates merge without conflicts. -->
+<resources>
+    <string name="fork_app_name">Xiangyin</string>
+    <string name="fork_tagline">Radio from home, wherever you are</string>
+    <string name="fork_nav_home">Home</string>
+    <string name="fork_nav_browse">Browse</string>
+
+    <string name="fork_startup_show_home">Home</string>
+    <string name="fork_search_hint">Search stations</string>
+    <string name="fork_action_retry">Retry</string>
+
+    <string name="fork_curated_beijing_title">Beijing &amp; national</string>
+    <string name="fork_curated_beijing_desc">Official Beijing, CNR and CRI live streams, checked by hand</string>
+    <string name="fork_curated_provincial_title">CNR &amp; provinces</string>
+    <string name="fork_curated_provincial_desc">Grouped by province, maintained by huangsuming/iptv</string>
+    <string name="fork_curated_china_title">China, auto-checked</string>
+    <string name="fork_curated_china_desc">Community list maintained by junguler/m3u-radio-music-playlists</string>
+    <string name="fork_curated_more">More playlists</string>
+    <string name="fork_curated_all">All</string>
+    <string name="fork_curated_add_all">Add all to favorites</string>
+    <string name="fork_curated_added">Added %1$d stations to favorites</string>
+    <string name="fork_curated_nothing_added">All stations are already favorites</string>
+    <string name="fork_curated_stations_count">%1$d stations</string>
+    <string name="fork_curated_updated">Updated %1$s</string>
+    <string name="fork_curated_bundled">Built-in copy</string>
+    <string name="fork_curated_refresh">Refresh</string>
+    <string name="fork_curated_load_failed">Couldn\'t load this playlist</string>
+    <string name="fork_curated_source">Source</string>
+    <string name="fork_curated_downloaded_on_open">Downloaded from the source when opened</string>
+
+    <string name="fork_player_live">Live</string>
+    <string name="fork_player_connecting">Connecting…</string>
+    <string name="fork_player_paused">Paused</string>
+    <string name="fork_player_play">Play</string>
+    <string name="fork_player_pause">Pause</string>
+    <string name="fork_player_previous">Previous station</string>
+    <string name="fork_player_next">Next station</string>
+    <string name="fork_player_favorite">Favorite</string>
+    <string name="fork_player_sleep_timer">Sleep timer</string>
+    <string name="fork_player_expand">Open player</string>
+    <string name="fork_player_collapse">Close player</string>
+
+    <string name="fork_empty_favorites">No favorites yet</string>
+    <string name="fork_empty_favorites_desc">Tap the star next to a station to keep it here</string>
+
+    <string name="fork_settings_dynamic_color">Dynamic color</string>
+    <string name="fork_settings_dynamic_color_desc">Use colors from your wallpaper (Android 12 and newer)</string>
+    <string name="fork_settings_pure_black">Pure black dark theme</string>
+    <string name="fork_settings_pure_black_desc">Black background in dark mode, saves power on OLED screens</string>
+
+    <string name="fork_about_title">About this fork</string>
+    <string name="fork_about_notice">This is a modified version of AMARadio by ounben, maintained at github.com/bowen-zhang01/AMARadio since 1 October 2026. It adds curated Chinese playlists and a Material 3 Expressive interface, and follows upstream releases.</string>
+    <string name="fork_about_fork_repo">Fork source code</string>
+    <string name="fork_about_upstream_repo">Original AMARadio</string>
+    <string name="fork_home_see_all">See all</string>
+    <string name="fork_home_popular">Popular worldwide</string>
+    <string name="fork_home_browse_more">Browse</string>
+    <string name="fork_now_playing">Now playing</string>
+    <string name="fork_greeting_morning">Good morning</string>
+    <string name="fork_greeting_afternoon">Good afternoon</string>
+    <string name="fork_greeting_evening">Good evening</string>
+    <string name="fork_greeting_night">Late night radio</string>
+</resources>
