@@ -1,6 +1,5 @@
 package com.ounben.amaradio.fork
 
-import com.ounben.amaradio.database.RegionCount
 import com.ounben.amaradio.fork.world.ChinaRegions
 import com.ounben.amaradio.fork.world.Continent
 import com.ounben.amaradio.fork.world.Countries
@@ -43,19 +42,34 @@ internal class WorldCatalogTest {
     }
 
     @Test
-    fun filtersMergeSpellingsPerProvince() {
-        val counts = listOf(
-            RegionCount("Chekiang", 115), RegionCount("Kiangsu", 118), RegionCount("Zhejiang", 100),
-            RegionCount("chekiang", 1), RegionCount("Music", 2), RegionCount("Beijing", 37)
+    fun stationNamesWinOverTheCatalogRegion() {
+        val cases = listOf(
+            Triple("南京交通广播", "", "jiangsu"),
+            Triple("苏州新闻广播", "Kiangsu", "jiangsu"),
+            Triple("新疆汉语新闻广播", "Beijing", "xinjiang"),
+            Triple("北京卫视伴音", "", "beijing"),
+            Triple("BRTV京津冀之声", "Beijing", "beijing"),
+            Triple("CNR-1 中国之声", "Beijing", "beijing"),
+            Triple("内蒙古新闻广播", "", "inner-mongolia"),
+            Triple("广东新闻广播", "Kwangtung", "guangdong"),
+            Triple("Canton Radio", "", "guangdong"),
+            Triple("幻想乡电台Gensokyo Radio", "Liaoning", "liaoning")
         )
+        cases.forEach { (name, subcountry, key) -> assertEquals(key, regions.classify(name, subcountry)?.key, name) }
+        // Latin names only match whole words; unknown names fall back to nothing.
+        assertNull(regions.classify("Tibetan Music", ""))
+        assertNull(regions.classify("两广之声音乐台", ""))
+        assertNull(regions.classify("Chinese Music World", "Music"))
+    }
 
-        val filters = regions.filters(counts)
+    @Test
+    fun regionChipsFollowTheAdministrativeOrder() {
+        val filters = regions.filters(mapOf("zhejiang" to 216, "beijing" to 45, "guangdong" to 90, "tibet" to 0))
 
-        assertEquals(listOf("zhejiang", "jiangsu", "beijing"), filters.map { it.id })
-        assertEquals(216, filters[0].stationCount)
-        assertEquals(setOf("Chekiang", "Zhejiang", "chekiang"), filters[0].catalogNames.toSet())
-        assertEquals("浙江", filters[0].labelZh)
-        assertEquals("Zhejiang", filters[0].label)
+        assertEquals(listOf("beijing", "zhejiang", "guangdong"), filters.map { it.id })
+        assertEquals("北京", filters[0].labelZh)
+        assertEquals("Beijing", filters[0].label)
+        assertEquals(45, filters[0].stationCount)
     }
 
     @Test

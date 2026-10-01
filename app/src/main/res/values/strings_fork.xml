@@ -10,7 +10,7 @@
     <string name="fork_action_retry">Retry</string>
 
     <string name="fork_curated_beijing_title">Beijing &amp; national</string>
-    <string name="fork_curated_beijing_desc">Official Beijing, CNR and CRI live streams, checked by hand</string>
+    <string name="fork_curated_beijing_desc">Official Beijing radio and TV audio, district stations, CNR and CRI live streams, checked by hand</string>
     <string name="fork_curated_provincial_title">CNR &amp; provinces</string>
     <string name="fork_curated_provincial_desc">Grouped by province, maintained by huangsuming/iptv</string>
     <string name="fork_curated_china_title">China, auto-checked</string>
@@ -92,4 +92,6 @@
     <string name="fork_proxy_type">Proxy type</string>
     <string name="fork_world_popular_short">Worldwide</string>
     <string name="fork_world_popular_desc_short">Most played</string>
+    <string name="fork_region_verified">Verified streams</string>
+    <string name="fork_region_catalog">More stations</string>
 </resources>

@@ -59,6 +59,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ounben.amaradio.R
+import com.ounben.amaradio.fork.curated.CuratedRepository
 import com.ounben.amaradio.fork.curated.CuratedSource
 import com.ounben.amaradio.fork.curated.CuratedSources
 import com.ounben.amaradio.fork.curated.CuratedViewModel
@@ -309,9 +310,10 @@ private fun SearchSectionTitle(title: String) {
 }
 
 /**
- * One country (or [Countries.WORLD]): for China the curated playlists first, then every
- * station of the catalog, most played first, with region filters where the catalog's
- * regions can be told apart.
+ * One country (or [Countries.WORLD]), or one region of it when [CountryViewModel.regionPage]
+ * is set. China's page starts with the curated playlists and can be narrowed to a province;
+ * a province's list starts with the verified streams of the bundled playlist, followed by
+ * the rest of the catalog, most played first.
  */
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -323,6 +325,7 @@ fun CountryScreen(
     isFavorite: (String) -> Boolean,
     onToggleFavorite: (DataRadioStation) -> Unit,
     onOpenPlaylist: (CuratedSource) -> Unit,
+    onOpenRegion: (String) -> Unit,
     onBack: () -> Unit
 ) {
     val state by viewModel.uiState.collectAsState()
@@ -330,15 +333,50 @@ fun CountryScreen(
     var stationWithOptions by remember { mutableStateOf<DataRadioStation?>(null) }
     val locale = uiLocale()
     val isChinese = locale.language == "zh"
-    val showCurated = viewModel.code == "CN"
+    val regionPage = viewModel.regionPage
+    val showCurated = viewModel.code == "CN" && regionPage == null
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
 
-    val title = if (viewModel.isWorld) "$WORLD_EMOJI  " + stringResource(R.string.fork_world_popular)
-    else EmojiUtils.getFlagEmoji(viewModel.code).orEmpty() + "  " + (country?.name ?: Countries.displayName(viewModel.code, locale))
+    // Verified streams of the selected region come first, and the catalog's copies of
+    // bundled streams (including the backups) are left out below them.
+    val bundled = curated[CuratedSources.beijingNational.id]?.playlist
+    val verified = remember(bundled, state.selectedRegion) {
+        state.selectedRegion?.let { bundled?.primaryStationsIn(it) }.orEmpty()
+    }
+    val catalog = remember(state.stations, bundled, verified) {
+        if (verified.isEmpty()) state.stations
+        else {
+            val bundledStreams = bundled?.stations.orEmpty().map { CuratedRepository.streamKey(it.StreamUrl) }.toSet()
+            state.stations.filterNot { CuratedRepository.streamKey(it.StreamUrl) in bundledStreams }
+        }
+    }
+    val regionName: (String?) -> String? = { id ->
+        state.region(id)?.let { if (isChinese) it.labelZh ?: it.label else it.label }
+    }
+
+    val flag = EmojiUtils.getFlagEmoji(viewModel.code).orEmpty()
+    val title = when {
+        viewModel.isWorld -> "$WORLD_EMOJI  " + stringResource(R.string.fork_world_popular)
+        regionPage != null -> "$flag  " + regionName(regionPage).orEmpty()
+        else -> "$flag  " + (country?.name ?: Countries.displayName(viewModel.code, locale))
+    }
     val subtitle = when {
         viewModel.isWorld -> stringResource(R.string.fork_world_popular_desc)
+        regionPage != null -> if (state.isLoading) null else stationCountText(verified.size + catalog.size)
         country != null -> stationCountText(country.stationCount)
         else -> null
+    }
+    val stationItem: @Composable (DataRadioStation, Int, Int) -> Unit = { station, index, count ->
+        StationListItem(
+            station = station,
+            isFavorite = isFavorite(station.StationUuid),
+            onClick = { onStationClick(station) },
+            onFavoriteClick = { onToggleFavorite(station) },
+            onLongClick = { stationWithOptions = station },
+            index = index,
+            count = count,
+            modifier = Modifier.padding(horizontal = 16.dp).padding(bottom = ListItemDefaults.SegmentedGap)
+        )
     }
 
     Column(modifier = Modifier.fillMaxSize().nestedScroll(scrollBehavior.nestedScrollConnection)) {
@@ -363,23 +401,21 @@ fun CountryScreen(
                 if (featured != null) {
                     curatedSections(
                         featured = featured,
-                        morePlaylists = CuratedSources.all.filterNot { it.isBundled }.mapNotNull { curated[it.id] },
+                        morePlaylists = CuratedSources.all.mapNotNull { curated[it.id] },
                         onStationClick = onStationClick,
                         onStationLongClick = { stationWithOptions = it },
-                        onOpenPlaylist = onOpenPlaylist
+                        onOpenPlaylist = onOpenPlaylist,
+                        onOpenRegion = onOpenRegion
                     )
                 }
                 item(key = "all-header") { SectionHeader(title = stringResource(R.string.fork_country_all_stations)) }
             }
-            if (state.regions.size > 1) {
+            if (regionPage == null && state.regions.size > 1) {
                 item(key = "regions") {
                     ChoiceChips(
                         options = state.regions.map { it.id },
                         selected = state.selectedRegion,
-                        label = { id ->
-                            val region = state.regions.first { it.id == id }
-                            if (isChinese) region.labelZh ?: region.label else region.label
-                        },
+                        label = { id -> regionName(id) ?: id },
                         onSelected = viewModel::selectRegion,
                         modifier = Modifier.padding(bottom = 8.dp),
                         contentPadding = PaddingValues(horizontal = 16.dp)
@@ -388,27 +424,27 @@ fun CountryScreen(
             }
             when {
                 state.isLoading -> item(key = "loading") { CenteredLoadingIndicator(Modifier.height(240.dp)) }
-                state.stations.isEmpty() -> item(key = "empty") {
+                verified.isEmpty() && catalog.isEmpty() -> item(key = "empty") {
                     Box(Modifier.height(280.dp)) {
                         ListMessage(icon = Icons.Rounded.SearchOff, title = stringResource(R.string.fork_country_no_stations))
                     }
                 }
                 else -> {
-                    itemsIndexed(state.stations, key = { _, station -> "station-${station.StationUuid}" }) { index, station ->
-                        StationListItem(
-                            station = station,
-                            isFavorite = isFavorite(station.StationUuid),
-                            onClick = { onStationClick(station) },
-                            onFavoriteClick = { onToggleFavorite(station) },
-                            onLongClick = { stationWithOptions = station },
-                            index = index,
-                            count = state.stations.size,
-                            modifier = Modifier.padding(horizontal = 16.dp).padding(bottom = ListItemDefaults.SegmentedGap)
-                        )
+                    if (verified.isNotEmpty()) {
+                        item(key = "verified-header") { ListSubheader(stringResource(R.string.fork_region_verified)) }
+                        itemsIndexed(verified, key = { _, station -> "verified-${station.StationUuid}" }) { index, station ->
+                            stationItem(station, index, verified.size)
+                        }
+                        if (catalog.isNotEmpty()) {
+                            item(key = "catalog-header") { ListSubheader(stringResource(R.string.fork_region_catalog)) }
+                        }
                     }
-                    if (state.isTruncated) item(key = "truncated") {
+                    itemsIndexed(catalog, key = { _, station -> "station-${station.StationUuid}" }) { index, station ->
+                        stationItem(station, index, catalog.size)
+                    }
+                    if (state.isTruncated && state.selectedRegion == null) item(key = "truncated") {
                         Text(
-                            text = stringResource(R.string.fork_country_truncated, formatCount(state.stations.size)),
+                            text = stringResource(R.string.fork_country_truncated, formatCount(catalog.size)),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 16.dp)
@@ -427,6 +463,16 @@ fun CountryScreen(
             onDismiss = { stationWithOptions = null }
         )
     }
+}
+
+@Composable
+private fun ListSubheader(title: String) {
+    Text(
+        title,
+        style = MaterialTheme.typography.titleSmall,
+        color = MaterialTheme.colorScheme.primary,
+        modifier = Modifier.fillMaxWidth().padding(start = 20.dp, end = 20.dp, top = 16.dp, bottom = 8.dp)
+    )
 }
 
 @Composable

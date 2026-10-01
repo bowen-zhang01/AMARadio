@@ -1,318 +1,481 @@
 {
- "_comment": "Province names for station regions (radio-browser Subcountry values use mixed romanizations). Used by the bowen-zhang01 fork.",
- "regions": [
-  {
-   "key": "beijing",
-   "en": "Beijing",
-   "zh": "北京",
-   "aliases": [
-    "Peking",
-    "Peiping",
-    "北京市"
-   ]
-  },
-  {
-   "key": "tianjin",
-   "en": "Tianjin",
-   "zh": "天津",
-   "aliases": [
-    "Tientsin",
-    "天津市"
-   ]
-  },
-  {
-   "key": "hebei",
-   "en": "Hebei",
-   "zh": "河北",
-   "aliases": [
-    "Hopei",
-    "Hopeh",
-    "河北省"
-   ]
-  },
-  {
-   "key": "shanxi",
-   "en": "Shanxi",
-   "zh": "山西",
-   "aliases": [
-    "Shansi",
-    "山西省"
-   ]
-  },
-  {
-   "key": "inner-mongolia",
-   "en": "Inner Mongolia",
-   "zh": "内蒙古",
-   "aliases": [
-    "Nei Mongol",
-    "Neimenggu",
-    "内蒙古自治区"
-   ]
-  },
-  {
-   "key": "liaoning",
-   "en": "Liaoning",
-   "zh": "辽宁",
-   "aliases": [
-    "Dalian",
-    "Shenyang",
-    "辽宁省",
-    "大连"
-   ]
-  },
-  {
-   "key": "jilin",
-   "en": "Jilin",
-   "zh": "吉林",
-   "aliases": [
-    "Kirin",
-    "吉林省"
-   ]
-  },
-  {
-   "key": "heilongjiang",
-   "en": "Heilongjiang",
-   "zh": "黑龙江",
-   "aliases": [
-    "Amur River",
-    "Heilungkiang",
-    "Harbin",
-    "黑龙江省"
-   ]
-  },
-  {
-   "key": "shanghai",
-   "en": "Shanghai",
-   "zh": "上海",
-   "aliases": [
-    "Shanghai Direct Administered Municipality",
-    "上海市"
-   ]
-  },
-  {
-   "key": "jiangsu",
-   "en": "Jiangsu",
-   "zh": "江苏",
-   "aliases": [
-    "Kiangsu",
-    "Nanjing",
-    "江苏省"
-   ]
-  },
-  {
-   "key": "zhejiang",
-   "en": "Zhejiang",
-   "zh": "浙江",
-   "aliases": [
-    "Chekiang",
-    "Hangzhou",
-    "浙江省"
-   ]
-  },
-  {
-   "key": "anhui",
-   "en": "Anhui",
-   "zh": "安徽",
-   "aliases": [
-    "Anhwei",
-    "安徽省"
-   ]
-  },
-  {
-   "key": "fujian",
-   "en": "Fujian",
-   "zh": "福建",
-   "aliases": [
-    "Fukien",
-    "福建省"
-   ]
-  },
-  {
-   "key": "jiangxi",
-   "en": "Jiangxi",
-   "zh": "江西",
-   "aliases": [
-    "Kiangsi",
-    "江西省"
-   ]
-  },
-  {
-   "key": "shandong",
-   "en": "Shandong",
-   "zh": "山东",
-   "aliases": [
-    "Shantung",
-    "山东省",
-    "安丘市"
-   ]
-  },
-  {
-   "key": "henan",
-   "en": "Henan",
-   "zh": "河南",
-   "aliases": [
-    "Honan",
-    "河南省"
-   ]
-  },
-  {
-   "key": "hubei",
-   "en": "Hubei",
-   "zh": "湖北",
-   "aliases": [
-    "Hupei",
-    "Hupeh",
-    "Wuhan",
-    "湖北省"
-   ]
-  },
-  {
-   "key": "hunan",
-   "en": "Hunan",
-   "zh": "湖南",
-   "aliases": [
-    "湖南省"
-   ]
-  },
-  {
-   "key": "guangdong",
-   "en": "Guangdong",
-   "zh": "广东",
-   "aliases": [
-    "Kwangtung",
-    "Canton",
-    "Guangzhou",
-    "Shenzhen",
-    "广东省"
-   ]
-  },
-  {
-   "key": "guangxi",
-   "en": "Guangxi",
-   "zh": "广西",
-   "aliases": [
-    "Kwangsi",
-    "广西壮族自治区"
-   ]
-  },
-  {
-   "key": "hainan",
-   "en": "Hainan",
-   "zh": "海南",
-   "aliases": [
-    "海南省"
-   ]
-  },
-  {
-   "key": "chongqing",
-   "en": "Chongqing",
-   "zh": "重庆",
-   "aliases": [
-    "Chungking",
-    "重庆市"
-   ]
-  },
-  {
-   "key": "sichuan",
-   "en": "Sichuan",
-   "zh": "四川",
-   "aliases": [
-    "Szechuan",
-    "Szechwan",
-    "Chengdu",
-    "成都",
-    "四川省"
-   ]
-  },
-  {
-   "key": "guizhou",
-   "en": "Guizhou",
-   "zh": "贵州",
-   "aliases": [
-    "Kweichow",
-    "贵州省"
-   ]
-  },
-  {
-   "key": "yunnan",
-   "en": "Yunnan",
-   "zh": "云南",
-   "aliases": [
-    "云南省"
-   ]
-  },
-  {
-   "key": "tibet",
-   "en": "Tibet",
-   "zh": "西藏",
-   "aliases": [
-    "Xizang",
-    "西藏自治区"
-   ]
-  },
-  {
-   "key": "shaanxi",
-   "en": "Shaanxi",
-   "zh": "陕西",
-   "aliases": [
-    "Shensi",
-    "Xi'an",
-    "陕西省"
-   ]
-  },
-  {
-   "key": "gansu",
-   "en": "Gansu",
-   "zh": "甘肃",
-   "aliases": [
-    "Kansu",
-    "甘肃省"
-   ]
-  },
-  {
-   "key": "qinghai",
-   "en": "Qinghai",
-   "zh": "青海",
-   "aliases": [
-    "Tsinghai",
-    "青海省"
-   ]
-  },
-  {
-   "key": "ningxia",
-   "en": "Ningxia",
-   "zh": "宁夏",
-   "aliases": [
-    "Ningsia",
-    "宁夏回族自治区"
-   ]
-  },
-  {
-   "key": "xinjiang",
-   "en": "Xinjiang",
-   "zh": "新疆",
-   "aliases": [
-    "Sinkiang",
-    "新疆维吾尔自治区"
-   ]
-  },
-  {
-   "key": "hong-kong",
-   "en": "Hong Kong",
-   "zh": "香港",
-   "aliases": [
-    "Hongkong",
-    "香港特别行政区"
-   ]
-  },
-  {
-   "key": "macau",
-   "en": "Macau",
-   "zh": "澳门",
-   "aliases": [
-    "Macao",
-    "澳门特别行政区"
-   ]
-  }
- ]
+  "_comment": "Province-level regions of China in administrative-division order (GB/T 2260), with the spellings found in radio-browser Subcountry values and station names (pinyin, postal romanization, Chinese, major cities). Used by the bowen-zhang01 fork.",
+  "regions": [
+    {
+      "key": "beijing",
+      "en": "Beijing",
+      "zh": "北京",
+      "aliases": [
+        "Peking",
+        "Peiping",
+        "北京市",
+        "京城"
+      ]
+    },
+    {
+      "key": "tianjin",
+      "en": "Tianjin",
+      "zh": "天津",
+      "aliases": [
+        "Tientsin",
+        "天津市",
+        "滨海新区"
+      ]
+    },
+    {
+      "key": "hebei",
+      "en": "Hebei",
+      "zh": "河北",
+      "aliases": [
+        "Hopei",
+        "Hopeh",
+        "河北省",
+        "石家庄",
+        "唐山",
+        "保定",
+        "邯郸",
+        "秦皇岛",
+        "张家口",
+        "承德",
+        "沧州",
+        "廊坊",
+        "衡水",
+        "邢台",
+        "涿州",
+        "固安"
+      ]
+    },
+    {
+      "key": "shanxi",
+      "en": "Shanxi",
+      "zh": "山西",
+      "aliases": [
+        "Shansi",
+        "山西省",
+        "太原",
+        "大同",
+        "运城",
+        "临汾",
+        "长治",
+        "晋城"
+      ]
+    },
+    {
+      "key": "inner-mongolia",
+      "en": "Inner Mongolia",
+      "zh": "内蒙古",
+      "aliases": [
+        "Nei Mongol",
+        "Neimenggu",
+        "内蒙古自治区",
+        "呼和浩特",
+        "包头",
+        "鄂尔多斯",
+        "赤峰",
+        "呼伦贝尔"
+      ]
+    },
+    {
+      "key": "liaoning",
+      "en": "Liaoning",
+      "zh": "辽宁",
+      "aliases": [
+        "Dalian",
+        "Shenyang",
+        "辽宁省",
+        "大连",
+        "沈阳",
+        "鞍山",
+        "抚顺",
+        "丹东",
+        "锦州",
+        "营口"
+      ]
+    },
+    {
+      "key": "jilin",
+      "en": "Jilin",
+      "zh": "吉林",
+      "aliases": [
+        "Kirin",
+        "吉林省",
+        "长春",
+        "延边",
+        "四平"
+      ]
+    },
+    {
+      "key": "heilongjiang",
+      "en": "Heilongjiang",
+      "zh": "黑龙江",
+      "aliases": [
+        "Amur River",
+        "Heilungkiang",
+        "Harbin",
+        "黑龙江省",
+        "哈尔滨",
+        "齐齐哈尔",
+        "牡丹江",
+        "大庆",
+        "佳木斯"
+      ]
+    },
+    {
+      "key": "shanghai",
+      "en": "Shanghai",
+      "zh": "上海",
+      "aliases": [
+        "Shanghai Direct Administered Municipality",
+        "上海市",
+        "浦东"
+      ]
+    },
+    {
+      "key": "jiangsu",
+      "en": "Jiangsu",
+      "zh": "江苏",
+      "aliases": [
+        "Kiangsu",
+        "Nanjing",
+        "江苏省",
+        "南京",
+        "苏州",
+        "无锡",
+        "常州",
+        "南通",
+        "徐州",
+        "扬州",
+        "镇江",
+        "盐城",
+        "连云港",
+        "淮安",
+        "泰州",
+        "宿迁",
+        "昆山",
+        "江阴"
+      ]
+    },
+    {
+      "key": "zhejiang",
+      "en": "Zhejiang",
+      "zh": "浙江",
+      "aliases": [
+        "Chekiang",
+        "Hangzhou",
+        "浙江省",
+        "杭州",
+        "宁波",
+        "温州",
+        "绍兴",
+        "嘉兴",
+        "湖州",
+        "金华",
+        "台州",
+        "丽水",
+        "衢州",
+        "舟山",
+        "义乌",
+        "青田"
+      ]
+    },
+    {
+      "key": "anhui",
+      "en": "Anhui",
+      "zh": "安徽",
+      "aliases": [
+        "Anhwei",
+        "安徽省",
+        "合肥",
+        "芜湖",
+        "蚌埠",
+        "安庆",
+        "黄山",
+        "马鞍山",
+        "阜阳"
+      ]
+    },
+    {
+      "key": "fujian",
+      "en": "Fujian",
+      "zh": "福建",
+      "aliases": [
+        "Fukien",
+        "福建省",
+        "福州",
+        "厦门",
+        "泉州",
+        "漳州",
+        "莆田",
+        "三明",
+        "龙岩"
+      ]
+    },
+    {
+      "key": "jiangxi",
+      "en": "Jiangxi",
+      "zh": "江西",
+      "aliases": [
+        "Kiangsi",
+        "江西省",
+        "南昌",
+        "赣州",
+        "九江",
+        "景德镇",
+        "上饶"
+      ]
+    },
+    {
+      "key": "shandong",
+      "en": "Shandong",
+      "zh": "山东",
+      "aliases": [
+        "Shantung",
+        "山东省",
+        "安丘市",
+        "济南",
+        "青岛",
+        "烟台",
+        "潍坊",
+        "淄博",
+        "临沂",
+        "威海",
+        "济宁",
+        "日照",
+        "泰安"
+      ]
+    },
+    {
+      "key": "henan",
+      "en": "Henan",
+      "zh": "河南",
+      "aliases": [
+        "Honan",
+        "河南省",
+        "郑州",
+        "洛阳",
+        "开封",
+        "南阳",
+        "新乡",
+        "安阳"
+      ]
+    },
+    {
+      "key": "hubei",
+      "en": "Hubei",
+      "zh": "湖北",
+      "aliases": [
+        "Hupei",
+        "Hupeh",
+        "Wuhan",
+        "湖北省",
+        "武汉",
+        "宜昌",
+        "襄阳",
+        "荆州",
+        "十堰",
+        "黄石"
+      ]
+    },
+    {
+      "key": "hunan",
+      "en": "Hunan",
+      "zh": "湖南",
+      "aliases": [
+        "湖南省",
+        "长沙",
+        "株洲",
+        "湘潭",
+        "衡阳",
+        "岳阳",
+        "常德",
+        "张家界"
+      ]
+    },
+    {
+      "key": "guangdong",
+      "en": "Guangdong",
+      "zh": "广东",
+      "aliases": [
+        "Kwangtung",
+        "Canton",
+        "Guangzhou",
+        "Shenzhen",
+        "广东省",
+        "广州",
+        "深圳",
+        "佛山",
+        "东莞",
+        "珠海",
+        "汕头",
+        "惠州",
+        "中山",
+        "江门",
+        "湛江",
+        "珠江",
+        "潮州"
+      ]
+    },
+    {
+      "key": "guangxi",
+      "en": "Guangxi",
+      "zh": "广西",
+      "aliases": [
+        "Kwangsi",
+        "广西壮族自治区",
+        "南宁",
+        "桂林",
+        "柳州",
+        "北海"
+      ]
+    },
+    {
+      "key": "hainan",
+      "en": "Hainan",
+      "zh": "海南",
+      "aliases": [
+        "海南省",
+        "海口",
+        "三亚"
+      ]
+    },
+    {
+      "key": "chongqing",
+      "en": "Chongqing",
+      "zh": "重庆",
+      "aliases": [
+        "Chungking",
+        "重庆市",
+        "万州"
+      ]
+    },
+    {
+      "key": "sichuan",
+      "en": "Sichuan",
+      "zh": "四川",
+      "aliases": [
+        "Szechuan",
+        "Szechwan",
+        "Chengdu",
+        "成都",
+        "四川省",
+        "绵阳",
+        "德阳",
+        "宜宾",
+        "南充",
+        "乐山",
+        "泸州"
+      ]
+    },
+    {
+      "key": "guizhou",
+      "en": "Guizhou",
+      "zh": "贵州",
+      "aliases": [
+        "Kweichow",
+        "贵州省",
+        "贵阳",
+        "遵义"
+      ]
+    },
+    {
+      "key": "yunnan",
+      "en": "Yunnan",
+      "zh": "云南",
+      "aliases": [
+        "云南省",
+        "昆明",
+        "大理",
+        "丽江",
+        "西双版纳"
+      ]
+    },
+    {
+      "key": "tibet",
+      "en": "Tibet",
+      "zh": "西藏",
+      "aliases": [
+        "Xizang",
+        "西藏自治区",
+        "拉萨"
+      ]
+    },
+    {
+      "key": "shaanxi",
+      "en": "Shaanxi",
+      "zh": "陕西",
+      "aliases": [
+        "Shensi",
+        "Xi'an",
+        "陕西省",
+        "西安",
+        "宝鸡",
+        "咸阳",
+        "延安",
+        "榆林"
+      ]
+    },
+    {
+      "key": "gansu",
+      "en": "Gansu",
+      "zh": "甘肃",
+      "aliases": [
+        "Kansu",
+        "甘肃省",
+        "兰州",
+        "天水",
+        "酒泉"
+      ]
+    },
+    {
+      "key": "qinghai",
+      "en": "Qinghai",
+      "zh": "青海",
+      "aliases": [
+        "Tsinghai",
+        "青海省",
+        "西宁"
+      ]
+    },
+    {
+      "key": "ningxia",
+      "en": "Ningxia",
+      "zh": "宁夏",
+      "aliases": [
+        "Ningsia",
+        "宁夏回族自治区",
+        "银川"
+      ]
+    },
+    {
+      "key": "xinjiang",
+      "en": "Xinjiang",
+      "zh": "新疆",
+      "aliases": [
+        "Sinkiang",
+        "新疆维吾尔自治区",
+        "乌鲁木齐",
+        "喀什",
+        "伊犁",
+        "克拉玛依"
+      ]
+    },
+    {
+      "key": "hong-kong",
+      "en": "Hong Kong",
+      "zh": "香港",
+      "aliases": [
+        "Hongkong",
+        "香港特别行政区"
+      ]
+    },
+    {
+      "key": "macau",
+      "en": "Macau",
+      "zh": "澳门",
+      "aliases": [
+        "Macao",
+        "澳门特别行政区"
+      ]
+    }
+  ]
 }
