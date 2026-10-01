@@ -78,4 +78,21 @@ internal class M3uPlaylistTest {
             assertTrue(logo.isFile, "missing ${logo.path}")
         }
     }
+
+    @Test
+    fun bundledPlaylistHasEnglishNames() {
+        val text = File("src/main/assets/curated/beijing-national.m3u").readText()
+        val chinese = CuratedRepository.toPlaylist(CuratedSources.beijingNational, text, null)
+        val english = CuratedRepository.toPlaylist(CuratedSources.beijingNational, text, null, english = true)
+        val cjk = Regex("[\\u3400-\\u9fff\\uff08\\uff09]")
+
+        assertEquals(listOf("北京", "北京（备用）", "中央台", "国际台"), chinese.groups)
+        assertEquals(listOf("Beijing", "Beijing (backup)", "CNR national", "CRI international"), english.groups)
+        assertTrue(english.stations.none { cjk.containsMatchIn(it.Name) || cjk.containsMatchIn(it.TagsAll) })
+        // Same stations and ids in both languages, so favourites survive a language switch.
+        assertEquals(chinese.stations.map { it.StationUuid }, english.stations.map { it.StationUuid })
+        assertEquals(chinese.backupUuids, english.backupUuids)
+        assertEquals("北京新闻广播 FM94.5", chinese.stations.first().Name)
+        assertEquals("Beijing News Radio FM94.5", english.stations.first().Name)
+    }
 }

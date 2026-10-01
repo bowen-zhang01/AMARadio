@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
@@ -67,6 +68,7 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
@@ -83,6 +85,7 @@ import coil.compose.AsyncImage
 import coil.compose.AsyncImagePainter
 import coil.request.ImageRequest
 import com.ounben.amaradio.R
+import com.ounben.amaradio.fork.ui.StationDetails
 import com.ounben.amaradio.data.DataCategory
 import com.ounben.amaradio.history.TrackHistoryEntry
 import com.ounben.amaradio.station.DataRadioStation
@@ -256,7 +259,7 @@ fun StationListTemplate(
     isGrid: Boolean,
     isLoading: Boolean = false,
     error: String? = null,
-    emptyMessage: String = "No stations found",
+    emptyMessage: String = stringResource(R.string.fork_no_stations),
     onRetry: (() -> Unit)? = null,
     onRefresh: (() -> Unit)? = null,
     onStationClick: (DataRadioStation) -> Unit,
@@ -309,7 +312,9 @@ fun StationList(
     onFavoriteClick: (DataRadioStation) -> Unit,
     isFavorite: (String) -> Boolean,
     onDeleteClick: ((DataRadioStation) -> Unit)? = null,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    /** Items above the stations (list mode only), e.g. matching countries in search. */
+    header: (LazyListScope.() -> Unit)? = null
 ) {
     var stationWithOptions by remember { mutableStateOf<DataRadioStation?>(null) }
 
@@ -341,6 +346,7 @@ fun StationList(
             contentPadding = ListContentPadding,
             verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap)
         ) {
+            header?.invoke(this)
             itemsIndexed(
                 items = stations,
                 key = { _, station -> station.StationUuid },
@@ -497,8 +503,9 @@ fun StationListItem(
     val context = LocalContext.current
     val isPlaying = LocalPlayingStationUuid.current == station.StationUuid
     val flagEmoji = remember(station.CountryCode) { EmojiUtils.getFlagEmoji(station.CountryCode) ?: "" }
-    val details = remember(station.ClickCount, station.Votes, station.Language, station.Bitrate, station.Codec) {
-        station.getShortDetails(context)
+    val locale = LocalConfiguration.current.locales[0]
+    val details = remember(station.ClickCount, station.Language, station.Bitrate, station.Codec, locale) {
+        StationDetails.short(station, context, locale)
     }
     val supporting = listOf(flagEmoji, details, station.TagsAll.takeIf { details.isBlank() }.orEmpty())
         .filter { it.isNotBlank() }

@@ -54,7 +54,7 @@
     <string name="filter_empty_filter_by">筛选依据</string>
     <string name="filter_empty_filter_desc">国家、电台名称、标签或语言</string>
     <string name="filter_empty_sort_by">排序依据</string>
-    <string name="filter_empty_sort_desc">点击量、字母顺序、票数 oder 最后修改</string>
+    <string name="filter_empty_sort_desc">点击量、字母顺序、票数或最后修改</string>
     <string name="filter_empty_hint">在上方字段中输入名称以保存此自定义视图！</string>
     <string name="error_station_load">无法连接电台</string>
     <string name="error_list_update">无法连接 radio browser 服务器</string>

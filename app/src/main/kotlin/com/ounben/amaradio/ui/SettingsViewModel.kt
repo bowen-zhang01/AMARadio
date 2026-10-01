@@ -57,11 +57,12 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
         
         // Migration of old localized startup actions to technical keys
         val rawValue = sharedPref.getString("startup_action", null)
-        if (rawValue != null && rawValue.contains("@string") || (rawValue != null && !listOf("home", "history", "favorites", "stations", "last").contains(rawValue))) {
+        if (rawValue != null && rawValue.contains("@string") || (rawValue != null && !listOf("home", "history", "favorites", "last").contains(rawValue))) {
             val migratedValue = when (rawValue) {
                 app.getString(R.string.startup_show_history) -> "history"
                 app.getString(R.string.startup_show_favorites) -> "favorites"
-                app.getString(R.string.startup_show_all_stations) -> "stations"
+                // The fork has no all-stations tab; the World tab ("home") replaces it.
+                "stations", app.getString(R.string.startup_show_all_stations) -> "home"
                 app.getString(R.string.startup_show_last_view) -> "last"
                 else -> "last"
             }

@@ -4,7 +4,7 @@ import androidx.annotation.StringRes
 import com.ounben.amaradio.R
 
 /**
- * A playlist shown on the Home tab.
+ * A curated playlist, shown on the China page of the World tab.
  *
  * Bundled playlists ship inside the APK (and can be refreshed from [updateUrl] without an
  * app release). Remote playlists are third-party lists without a redistribution licence,

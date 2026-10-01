@@ -140,7 +140,7 @@ class FilterViewModel(application: Application) : AndroidViewModel(application) 
                 
                 // FALLBACK: Only if confirmed empty
                 val finalTabs = if (mergedTabs.isEmpty()) {
-                    listOf(FilterTabItem(label = "Filter"))
+                    listOf(FilterTabItem(label = app.getString(R.string.action_filter)))
                 } else {
                     mergedTabs
                 }

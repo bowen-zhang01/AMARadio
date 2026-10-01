@@ -9,28 +9,31 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.input.clearText
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.filled.History
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Radio
+import androidx.compose.material.icons.filled.Public
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.History
-import androidx.compose.material.icons.outlined.Home
-import androidx.compose.material.icons.outlined.Radio
+import androidx.compose.material.icons.outlined.Public
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.StarOutline
 import androidx.compose.material.icons.rounded.BarChart
 import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material.icons.rounded.SearchOff
+import androidx.compose.material.icons.rounded.Tune
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExpandedFullScreenSearchBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
@@ -38,6 +41,7 @@ import androidx.compose.material3.ShortNavigationBar
 import androidx.compose.material3.ShortNavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.rememberSearchBarState
 import androidx.compose.runtime.Composable
@@ -53,6 +57,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.core.content.edit
@@ -68,10 +73,16 @@ import com.ounben.amaradio.AMARadioApp
 import com.ounben.amaradio.R
 import com.ounben.amaradio.fork.curated.CuratedSources
 import com.ounben.amaradio.fork.curated.CuratedViewModel
+import com.ounben.amaradio.fork.ui.CountryScreen
 import com.ounben.amaradio.fork.ui.CuratedPlaylistScreen
-import com.ounben.amaradio.fork.ui.HomeScreen
+import com.ounben.amaradio.fork.ui.WorldScreen
+import com.ounben.amaradio.fork.ui.countrySearchResults
 import com.ounben.amaradio.fork.ui.rememberArtworkColorScheme
+import com.ounben.amaradio.fork.world.Countries
+import com.ounben.amaradio.fork.world.CountryViewModel
+import com.ounben.amaradio.fork.world.WorldViewModel
 import com.ounben.amaradio.history.TrackHistoryViewModel
+import com.ounben.amaradio.players.PlayState
 import com.ounben.amaradio.station.DataRadioStation
 import kotlinx.coroutines.launch
 
@@ -81,8 +92,12 @@ sealed class Screen(
     val icon: ImageVector,
     val selectedIcon: ImageVector = icon
 ) {
-    object Home : Screen("home", R.string.fork_nav_home, Icons.Outlined.Home, Icons.Filled.Home)
-    object Stations : Screen("stations", R.string.fork_nav_browse, Icons.Outlined.Radio, Icons.Filled.Radio)
+    object World : Screen("world", R.string.fork_nav_world, Icons.Outlined.Public, Icons.Filled.Public)
+    object Country : Screen("country/{code}", R.string.fork_nav_world, Icons.Outlined.Public) {
+        fun routeFor(code: String) = "country/$code"
+    }
+    /** Upstream's station tabs (device country + custom filters), opened from the World top bar. */
+    object Stations : Screen("stations", R.string.fork_advanced_filters, Icons.Rounded.Tune)
     object Favourites : Screen("starred", R.string.nav_item_starred, Icons.Outlined.StarOutline, Icons.Filled.Star)
     object History : Screen("history", R.string.nav_item_history, Icons.Outlined.History, Icons.Filled.History)
     object Settings : Screen("settings", R.string.nav_item_settings, Icons.Outlined.Settings, Icons.Filled.Settings)
@@ -93,7 +108,10 @@ sealed class Screen(
     }
 }
 
-private val topLevelScreens = listOf(Screen.Home, Screen.Stations, Screen.Favourites, Screen.History, Screen.Settings)
+private val topLevelScreens = listOf(Screen.World, Screen.Favourites, Screen.History, Screen.Settings)
+
+/** Routes shown under the World tab. */
+private val worldRoutes = setOf(Screen.World.route, Screen.Country.route, Screen.Playlist.route, Screen.Stations.route)
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -112,6 +130,7 @@ fun MainScreen(
     val searchViewModel: SearchViewModel = viewModel()
     val serverInfoViewModel: ServerInfoViewModel = viewModel()
     val curatedViewModel: CuratedViewModel = viewModel()
+    val worldViewModel: WorldViewModel = viewModel()
     val settingsViewModel: SettingsViewModel = viewModel()
 
     val mainUiState by mainViewModel.uiState.collectAsState()
@@ -119,7 +138,15 @@ fun MainScreen(
     val searchUiState by searchViewModel.uiState.collectAsState()
     val settingsUiState by settingsViewModel.uiState.collectAsState()
     val curatedSources by curatedViewModel.sources.collectAsState()
+    val worldState by worldViewModel.uiState.collectAsState()
     val playerWarning by playerViewModel.warningMessage.collectAsState()
+
+    // Country and curated station names follow the interface language.
+    val uiLocale = LocalConfiguration.current.locales[0]
+    LaunchedEffect(uiLocale) {
+        curatedViewModel.setLocale(uiLocale)
+        worldViewModel.setLocale(uiLocale)
+    }
 
     LaunchedEffect(playerWarning) {
         playerWarning?.let { msgRes ->
@@ -138,16 +165,16 @@ fun MainScreen(
     val currentDestination = navBackStackEntry?.destination
     val currentRoute = currentDestination?.route
 
-    // Startup destination (settings: history / favorites / stations / home / last view).
+    // Startup destination (settings: world / history / favorites / last view). "home" is the
+    // stored value of the World option; it named the curated Home tab in 1.40-bz1.
     val startRoute = remember(settingsUiState.startupAction) {
         val sharedPref = PreferenceManager.getDefaultSharedPreferences(context)
-        val lastRoute = sharedPref.getString("last_view_route", Screen.Home.route) ?: Screen.Home.route
+        val lastRoute = sharedPref.getString("last_view_route", Screen.World.route) ?: Screen.World.route
         when (settingsUiState.startupAction) {
             "history" -> Screen.History.route
             "favorites" -> Screen.Favourites.route
-            "stations" -> Screen.Stations.route
-            "home" -> Screen.Home.route
-            else -> lastRoute.takeIf { route -> topLevelScreens.any { it.route == route } } ?: Screen.Home.route
+            "home", "stations" -> Screen.World.route
+            else -> lastRoute.takeIf { route -> topLevelScreens.any { it.route == route } } ?: Screen.World.route
         }
     }
 
@@ -187,6 +214,11 @@ fun MainScreen(
     val searchResults = remember(curatedMatches, searchUiState.results) {
         (curatedMatches + searchUiState.results).distinctBy { it.StationUuid }
     }
+    val countryMatches = remember(searchQuery, worldState) { worldState.search(searchQuery).take(MAX_COUNTRY_MATCHES) }
+    val openCountry: (String) -> Unit = { code ->
+        if (code != Countries.WORLD) worldViewModel.markVisited(code)
+        navController.navigate(Screen.Country.routeFor(code))
+    }
     val searchInputField: @Composable () -> Unit = {
         StationSearchInputField(
             textFieldState = searchFieldState,
@@ -214,7 +246,10 @@ fun MainScreen(
     val artworkScheme = rememberArtworkColorScheme(playerUiState.currentStation?.IconUrl)
     val playerColorScheme = artworkScheme ?: MaterialTheme.colorScheme
 
-    CompositionLocalProvider(LocalPlayingStationUuid provides playerUiState.currentStation?.StationUuid) {
+    // Lists mark the current station only while it plays (or is connecting), not when paused.
+    val playingUuid = playerUiState.currentStation?.StationUuid
+        ?.takeIf { playerUiState.playState == PlayState.Playing || playerUiState.playState == PlayState.PrePlaying }
+    CompositionLocalProvider(LocalPlayingStationUuid provides playingUuid) {
         Scaffold(
             topBar = {
                 when {
@@ -222,7 +257,7 @@ fun MainScreen(
                     isTopLevel || currentRoute == null -> MainSearchTopBar(
                         searchBarState = searchBarState,
                         inputField = searchInputField,
-                        showFilter = currentRoute == Screen.Stations.route,
+                        showFilter = currentRoute == Screen.World.route,
                         onFilterClick = {
                             mainViewModel.setStationsInitialTab(1)
                             navController.navigate(Screen.Stations.route)
@@ -251,14 +286,16 @@ fun MainScreen(
                             val selected = when (screen) {
                                 Screen.Settings -> currentRoute == Screen.Settings.route ||
                                     currentRoute == Screen.About.route || currentRoute == Screen.Statistics.route
-                                Screen.Home -> currentRoute == Screen.Home.route || currentRoute == Screen.Playlist.route
+                                Screen.World -> currentRoute in worldRoutes
                                 else -> currentDestination?.hierarchy?.any { it.route == screen.route } == true
                             }
                             ShortNavigationBarItem(
                                 selected = selected,
                                 onClick = {
-                                    if (screen == Screen.Stations) mainViewModel.setStationsInitialTab(0)
-                                    navController.navigate(screen.route) {
+                                    // Re-selecting World from a country page goes back to the list.
+                                    val backToWorld = selected && screen == Screen.World && currentRoute != Screen.World.route &&
+                                        navController.popBackStack(Screen.World.route, inclusive = false)
+                                    if (!backToWorld) navController.navigate(screen.route) {
                                         popUpTo(navController.graph.findStartDestination().id) { saveState = true }
                                         launchSingleTop = true
                                         restoreState = true
@@ -278,20 +315,20 @@ fun MainScreen(
                     startDestination = startRoute,
                     modifier = Modifier.fillMaxSize()
                 ) {
-                    composable(Screen.Home.route) {
-                        HomeScreen(
-                            viewModel = curatedViewModel,
+                    composable(Screen.World.route) {
+                        WorldScreen(viewModel = worldViewModel, onOpenCountry = openCountry)
+                    }
+                    composable(Screen.Country.route) {
+                        val countryViewModel: CountryViewModel = viewModel()
+                        CountryScreen(
+                            viewModel = countryViewModel,
+                            country = worldState.country(countryViewModel.code),
+                            curatedViewModel = curatedViewModel,
                             onStationClick = playStation,
                             isFavorite = isFavourite,
+                            onToggleFavorite = toggleFavourite,
                             onOpenPlaylist = { source -> navController.navigate(Screen.Playlist.routeFor(source.id)) },
-                            onBrowseAll = {
-                                mainViewModel.setStationsInitialTab(0)
-                                navController.navigate(Screen.Stations.route) {
-                                    popUpTo(navController.graph.findStartDestination().id) { saveState = true }
-                                    launchSingleTop = true
-                                    restoreState = true
-                                }
-                            }
+                            onBack = { navController.popBackStack() }
                         )
                     }
                     composable(Screen.Playlist.route) { entry ->
@@ -307,11 +344,13 @@ fun MainScreen(
                         }
                     }
                     composable(Screen.Stations.route) {
-                        TabsScreen(
-                            initialTab = mainUiState.stationsInitialTab,
-                            onStationClick = playStation,
-                            onCategoryClick = { }
-                        )
+                        AdvancedFiltersScreen(onBack = { navController.popBackStack() }) {
+                            TabsScreen(
+                                initialTab = mainUiState.stationsInitialTab,
+                                onStationClick = playStation,
+                                onCategoryClick = { }
+                            )
+                        }
                     }
                     composable(Screen.Favourites.route) {
                         val favViewModel: LocalStationsViewModel = viewModel(
@@ -376,10 +415,11 @@ fun MainScreen(
         }
 
         ExpandedFullScreenSearchBar(state = searchBarState, inputField = searchInputField) {
+            val hasMatches = countryMatches.isNotEmpty() || searchResults.isNotEmpty()
             when {
-                searchQuery.length < 2 && curatedMatches.isEmpty() -> Unit
-                searchResults.isEmpty() && searchUiState.isSearching -> CenteredLoadingIndicator()
-                searchResults.isEmpty() -> ListMessage(
+                searchQuery.length < 2 && !hasMatches -> Unit
+                !hasMatches && searchUiState.isSearching -> CenteredLoadingIndicator()
+                !hasMatches -> ListMessage(
                     icon = Icons.Rounded.SearchOff,
                     title = stringResource(R.string.searchpreference_no_results)
                 )
@@ -391,7 +431,14 @@ fun MainScreen(
                         scope.launch { searchBarState.animateToCollapsed() }
                     },
                     onFavoriteClick = toggleFavourite,
-                    isFavorite = { uuid -> searchUiState.favoriteIds.contains(uuid) || mainUiState.favoriteIds.contains(uuid) }
+                    isFavorite = { uuid -> searchUiState.favoriteIds.contains(uuid) || mainUiState.favoriteIds.contains(uuid) },
+                    header = {
+                        countrySearchResults(countryMatches, hasStations = searchResults.isNotEmpty()) { country ->
+                            scope.launch { searchBarState.animateToCollapsed() }
+                            searchFieldState.clearText()
+                            openCountry(country.code)
+                        }
+                    }
                 )
             }
         }
@@ -437,6 +484,27 @@ fun MainScreen(
                 TextButton(onClick = { showDeleteConfirmDialog = null }) { Text(stringResource(R.string.no)) }
             }
         )
+    }
+}
+
+private const val MAX_COUNTRY_MATCHES = 6
+
+/** Upstream's station tabs with a back button; they are no longer a top-level destination. */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun AdvancedFiltersScreen(onBack: () -> Unit, content: @Composable () -> Unit) {
+    Column(modifier = Modifier.fillMaxSize()) {
+        TopAppBar(
+            // The Scaffold already applies the status bar inset.
+            windowInsets = WindowInsets(0, 0, 0, 0),
+            title = { Text(stringResource(R.string.fork_advanced_filters)) },
+            navigationIcon = {
+                IconButton(onClick = onBack) {
+                    Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = stringResource(R.string.accessibility_back))
+                }
+            }
+        )
+        content()
     }
 }
 

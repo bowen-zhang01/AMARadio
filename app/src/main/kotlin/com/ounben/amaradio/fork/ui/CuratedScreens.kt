@@ -14,7 +14,6 @@ import androidx.compose.material3.carousel.rememberCarouselState
 import androidx.compose.ui.graphics.RectangleShape
 import com.ounben.amaradio.ui.LocalPlayingStationUuid
 import com.ounben.amaradio.ui.StationIcon
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -32,7 +31,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.automirrored.rounded.QueueMusic
@@ -77,7 +75,6 @@ import androidx.compose.ui.unit.dp
 import com.ounben.amaradio.R
 import com.ounben.amaradio.fork.curated.CuratedSource
 import com.ounben.amaradio.fork.curated.CuratedSourceState
-import com.ounben.amaradio.fork.curated.CuratedSources
 import com.ounben.amaradio.fork.curated.CuratedViewModel
 import com.ounben.amaradio.station.DataRadioStation
 import com.ounben.amaradio.ui.CenteredLoadingIndicator
@@ -88,130 +85,49 @@ import com.ounben.amaradio.ui.StationOptionsDialog
 private val ScreenPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 24.dp)
 
 /**
- * Home tab: a greeting, the bundled playlist as sections (first group as a carousel), the
- * most-played stations worldwide, and entry points to the larger community playlists.
+ * The curated part of the China page: the bundled playlist as sections (first group as a
+ * carousel, the others as artwork rows) followed by the community playlists.
  */
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
-@Composable
-fun HomeScreen(
-    viewModel: CuratedViewModel,
+internal fun LazyListScope.curatedSections(
+    featured: CuratedSourceState,
+    morePlaylists: List<CuratedSourceState>,
     onStationClick: (DataRadioStation) -> Unit,
-    isFavorite: (String) -> Boolean,
-    onOpenPlaylist: (CuratedSource) -> Unit,
-    onBrowseAll: () -> Unit
+    onStationLongClick: (DataRadioStation) -> Unit,
+    onOpenPlaylist: (CuratedSource) -> Unit
 ) {
-    val sources by viewModel.sources.collectAsState()
-    val popular by viewModel.popular.collectAsState()
-    val featured = sources[CuratedSources.beijingNational.id] ?: return
-    var stationWithOptions by remember { mutableStateOf<DataRadioStation?>(null) }
     val playlist = featured.playlist
-    // Groups of the bundled list in order, without the backup streams.
-    val sections = remember(playlist) {
-        playlist?.primaryStations.orEmpty().groupBy { it.TagsAll }.toList()
+    if (playlist == null && featured.isLoading) {
+        item(key = "featured-loading") { CenteredLoadingIndicator(Modifier.height(200.dp)) }
     }
-
-    LazyColumn(
-        modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(bottom = 24.dp)
-    ) {
-        item(key = "greeting") { HomeGreeting() }
-
-        if (playlist == null) {
-            playlistBody(
-                state = featured,
-                selectedGroup = null,
-                onGroupSelected = {},
-                onStationClick = onStationClick,
-                onFavoriteClick = { viewModel.toggleFavourite(it) },
-                onLongClick = { stationWithOptions = it },
-                isFavorite = isFavorite,
-                onRetry = { viewModel.load(featured.source, forceRefresh = true) }
+    // Groups of the bundled list in order, without the backup streams.
+    val sections = playlist?.primaryStations.orEmpty().groupBy { it.TagsAll }.toList()
+    sections.forEachIndexed { index, (group, stations) ->
+        item(key = "featured-header-$group") {
+            SectionHeader(
+                title = group,
+                actionLabel = if (index == 0) stringResource(R.string.fork_home_see_all) else null,
+                onAction = { onOpenPlaylist(featured.source) }
             )
         }
-
-        sections.forEachIndexed { sectionIndex, (group, stations) ->
-            item(key = "header-$group") {
-                SectionHeader(
-                    title = group,
-                    actionLabel = if (sectionIndex == 0) stringResource(R.string.fork_home_see_all) else null,
-                    onAction = { onOpenPlaylist(CuratedSources.beijingNational) }
-                )
-            }
-            if (sectionIndex == 0) {
-                item(key = "carousel-$group") {
-                    StationCarousel(stations, onStationClick, onLongClick = { stationWithOptions = it })
-                }
-            } else {
-                itemsIndexed(stations, key = { _, station -> "home-${station.StationUuid}" }) { index, station ->
-                    Box(modifier = Modifier.padding(horizontal = 16.dp).padding(bottom = ListItemDefaults.SegmentedGap)) {
-                        StationListItem(
-                            station = station,
-                            isFavorite = isFavorite(station.StationUuid),
-                            onClick = { onStationClick(station) },
-                            onFavoriteClick = { viewModel.toggleFavourite(station) },
-                            onLongClick = { stationWithOptions = station },
-                            index = index,
-                            count = stations.size
-                        )
-                    }
-                }
-            }
+        item(key = "featured-row-$group") {
+            if (index == 0) StationCarousel(stations, onStationClick, onStationLongClick)
+            else StationTileRow(stations, onStationClick, onStationLongClick)
         }
-
-        if (popular.isNotEmpty()) {
-            item(key = "popular-header") {
-                SectionHeader(
-                    title = stringResource(R.string.fork_home_popular),
-                    actionLabel = stringResource(R.string.fork_home_browse_more),
-                    onAction = onBrowseAll
-                )
-            }
-            item(key = "popular-row") {
-                StationTileRow(popular, onStationClick, onLongClick = { stationWithOptions = it })
-            }
-        }
-
+    }
+    if (morePlaylists.isNotEmpty()) {
         item(key = "more-header") { SectionHeader(title = stringResource(R.string.fork_curated_more)) }
-        CuratedSources.all.filterNot { it.isBundled }.forEach { source ->
-            item(key = "card-${source.id}") {
+        morePlaylists.forEach { state ->
+            item(key = "card-${state.source.id}") {
                 Box(modifier = Modifier.padding(horizontal = 16.dp)) {
-                    PlaylistCard(state = sources[source.id] ?: CuratedSourceState(source), onClick = { onOpenPlaylist(source) })
+                    PlaylistCard(state = state, onClick = { onOpenPlaylist(state.source) })
                 }
             }
         }
     }
-
-    stationWithOptions?.let { station ->
-        StationOptionsDialog(
-            station = station,
-            isFavorite = isFavorite(station.StationUuid),
-            onFavoriteClick = { viewModel.toggleFavourite(station) },
-            onDismiss = { stationWithOptions = null }
-        )
-    }
 }
 
 @Composable
-private fun HomeGreeting() {
-    val hour = remember { java.util.Calendar.getInstance().get(java.util.Calendar.HOUR_OF_DAY) }
-    val greeting = when (hour) {
-        in 5..10 -> R.string.fork_greeting_morning
-        in 11..17 -> R.string.fork_greeting_afternoon
-        in 18..22 -> R.string.fork_greeting_evening
-        else -> R.string.fork_greeting_night
-    }
-    Column(modifier = Modifier.fillMaxWidth().padding(start = 20.dp, end = 20.dp, top = 12.dp, bottom = 4.dp)) {
-        Text(stringResource(greeting), style = MaterialTheme.typography.headlineLarge)
-        Text(
-            text = stringResource(R.string.fork_tagline),
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-    }
-}
-
-@Composable
-private fun SectionHeader(title: String, actionLabel: String? = null, onAction: () -> Unit = {}) {
+internal fun SectionHeader(title: String, actionLabel: String? = null, onAction: () -> Unit = {}) {
     Row(
         modifier = Modifier.fillMaxWidth().padding(start = 20.dp, end = 8.dp, top = 24.dp, bottom = 8.dp),
         verticalAlignment = Alignment.CenterVertically
@@ -241,7 +157,7 @@ private fun NowPlayingBadge(modifier: Modifier = Modifier) {
 /** Material 3 multi-browse carousel of large station artwork. */
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
-private fun StationCarousel(
+internal fun StationCarousel(
     stations: List<DataRadioStation>,
     onStationClick: (DataRadioStation) -> Unit,
     onLongClick: (DataRadioStation) -> Unit
@@ -278,7 +194,7 @@ private fun StationCarousel(
 /** Horizontally scrolling station tiles (logo and name). */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun StationTileRow(
+internal fun StationTileRow(
     stations: List<DataRadioStation>,
     onStationClick: (DataRadioStation) -> Unit,
     onLongClick: (DataRadioStation) -> Unit
@@ -420,7 +336,7 @@ private fun PlaylistHeader(
                 )
             } ?: stringResource(R.string.fork_curated_bundled)
             Text(
-                text = stringResource(R.string.fork_curated_stations_count, playlist.stations.size) + " · " + freshness,
+                text = stationCountText(playlist.stations.size) + " · " + freshness,
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -503,20 +419,36 @@ private fun LazyListScope.playlistBody(
 
 @Composable
 private fun GroupChips(groups: List<String>, selected: String?, onSelected: (String?) -> Unit) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .horizontalScroll(rememberScrollState())
-            .padding(bottom = 8.dp),
+    ChoiceChips(
+        options = groups,
+        selected = selected,
+        label = { it },
+        onSelected = onSelected,
+        modifier = Modifier.padding(bottom = 8.dp)
+    )
+}
+
+/** A row of filter chips: "All" followed by [options]; selecting "All" passes null. */
+@Composable
+internal fun <T> ChoiceChips(
+    options: List<T>,
+    selected: T?,
+    label: @Composable (T) -> String,
+    onSelected: (T?) -> Unit,
+    modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(0.dp)
+) {
+    LazyRow(
+        modifier = modifier.fillMaxWidth(),
+        contentPadding = contentPadding,
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        val all = listOf<String?>(null) + groups
-        all.forEach { group ->
-            val isSelected = group == selected
+        items(listOf<T?>(null) + options) { option ->
+            val isSelected = option == selected
             FilterChip(
                 selected = isSelected,
-                onClick = { onSelected(group) },
-                label = { Text(group ?: stringResource(R.string.fork_curated_all)) },
+                onClick = { onSelected(option) },
+                label = { Text(if (option == null) stringResource(R.string.fork_curated_all) else label(option)) },
                 leadingIcon = if (isSelected) {
                     { Icon(Icons.Rounded.Done, contentDescription = null, modifier = Modifier.size(FilterChipDefaults.IconSize)) }
                 } else null
@@ -561,7 +493,7 @@ private fun PlaylistCard(state: CuratedSourceState, onClick: () -> Unit) {
                 )
                 Spacer(Modifier.height(4.dp))
                 Text(
-                    text = state.playlist?.let { stringResource(R.string.fork_curated_stations_count, it.stations.size) }
+                    text = state.playlist?.let { stationCountText(it.stations.size) }
                         ?: stringResource(R.string.fork_curated_downloaded_on_open),
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.primary

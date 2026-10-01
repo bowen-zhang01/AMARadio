@@ -212,7 +212,7 @@ fun ProxySettingsDialogCompose(onDismiss: () -> Unit) {
                         value = uiState.type.name,
                         onValueChange = {},
                         readOnly = true,
-                        label = { Text("Proxy Type") },
+                        label = { Text(stringResource(R.string.fork_proxy_type)) },
                         modifier = Modifier.fillMaxWidth(),
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
                         colors = OutlinedTextFieldDefaults.colors(

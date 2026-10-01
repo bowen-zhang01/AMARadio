@@ -2,10 +2,8 @@
 <resources>
     <string name="fork_app_name">乡音</string>
     <string name="fork_tagline">海上生明月，天涯共此时</string>
-    <string name="fork_nav_home">精选</string>
-    <string name="fork_nav_browse">发现</string>
 
-    <string name="fork_startup_show_home">精选</string>
+    <string name="fork_startup_show_home">全球</string>
     <string name="fork_search_hint">搜索电台</string>
     <string name="fork_action_retry">重试</string>
 
@@ -20,7 +18,6 @@
     <string name="fork_curated_add_all">全部加入收藏</string>
     <string name="fork_curated_added">已把 %1$d 个电台加入收藏</string>
     <string name="fork_curated_nothing_added">这些电台都已经在收藏里了</string>
-    <string name="fork_curated_stations_count">%1$d 个电台</string>
     <string name="fork_curated_updated">更新于 %1$s</string>
     <string name="fork_curated_bundled">内置版本</string>
     <string name="fork_curated_refresh">刷新</string>
@@ -49,15 +46,46 @@
     <string name="fork_settings_pure_black_desc">深色模式使用纯黑背景，OLED 屏幕更省电</string>
 
     <string name="fork_about_title">关于这个分支</string>
-    <string name="fork_about_notice">这是 ounben 开发的 AMARadio 的修改版，自 2026 年 10 月 1 日起在 github.com/bowen-zhang01/AMARadio 维护，增加了中文精选歌单和 Material 3 Expressive 界面，并持续跟进原版更新。</string>
+    <string name="fork_about_notice">这是 ounben 开发的 AMARadio 的修改版，自 2026 年 10 月 1 日起在 github.com/bowen-zhang01/AMARadio 维护，改为从全球国家列表开始，增加了中文精选歌单和 Material 3 Expressive 界面，并持续跟进原版更新。</string>
     <string name="fork_about_fork_repo">分支源代码</string>
     <string name="fork_about_upstream_repo">原版 AMARadio</string>
     <string name="fork_home_see_all">全部</string>
-    <string name="fork_home_popular">全球热门</string>
-    <string name="fork_home_browse_more">发现更多</string>
     <string name="fork_now_playing">正在播放</string>
     <string name="fork_greeting_morning">早上好</string>
     <string name="fork_greeting_afternoon">下午好</string>
     <string name="fork_greeting_evening">晚上好</string>
     <string name="fork_greeting_night">夜深了</string>
+
+    <string name="fork_nav_world">全球</string>
+    <string name="fork_world_summary">%1$s 个国家和地区 · %2$s 个电台</string>
+    <string name="fork_world_popular">全球热门</string>
+    <string name="fork_world_popular_desc">播放最多的电台</string>
+    <string name="fork_world_catalog_empty">电台目录还没准备好</string>
+    <string name="fork_world_catalog_empty_desc">联网时会在后台下载，请稍后再试。</string>
+    <string name="fork_continent_asia">亚洲</string>
+    <string name="fork_continent_europe">欧洲</string>
+    <string name="fork_continent_north_america">北美洲</string>
+    <string name="fork_continent_south_america">南美洲</string>
+    <string name="fork_continent_oceania">大洋洲</string>
+    <string name="fork_continent_africa">非洲</string>
+    <string name="fork_continent_other">其他</string>
+    <string name="fork_country_all_stations">全部电台</string>
+    <string name="fork_country_no_stations">这里还没有电台</string>
+    <string name="fork_country_truncated">这里显示播放最多的 %1$s 个电台，其他电台可以搜索。</string>
+    <string name="fork_search_countries">国家和地区</string>
+    <string name="fork_search_stations">电台</string>
+    <string name="fork_advanced_filters">高级筛选</string>
+    <plurals name="fork_station_count">
+        <item quantity="other">%1$s 个电台</item>
+    </plurals>
+    <plurals name="fork_station_clicks">
+        <item quantity="other">%1$s 次点击</item>
+    </plurals>
+    <string name="fork_no_stations">没有找到电台</string>
+    <string name="fork_stats_global_api">全球 API</string>
+    <string name="fork_stats_refresh">刷新 API 统计</string>
+    <string name="fork_stats_no_changes">最近没有变更记录。</string>
+    <string name="fork_proxy_type">代理类型</string>
+    <string name="fork_world_popular_short">全球热门</string>
+    <string name="fork_world_popular_desc_short">播放最多</string>
 </resources>

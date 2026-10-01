@@ -20,7 +20,11 @@ data class CuratedPlaylist(
     /** When the copy in use was downloaded, or null for the copy bundled in the APK. */
     val fetchedAt: Long?,
     /** Stations marked `x-role="backup"`: alternative streams of another entry. */
-    val backupUuids: Set<String> = emptySet()
+    val backupUuids: Set<String> = emptySet(),
+    /** Whether names come from the `x-name-en` / `x-group-en` attributes. */
+    val english: Boolean = false,
+    /** The M3U text, kept to re-label the stations when the interface language changes. */
+    val text: String = ""
 ) {
     val primaryStations: List<DataRadioStation>
         get() = stations.filterNot { it.StationUuid in backupUuids }
@@ -36,7 +40,7 @@ class CuratedRepository(
 ) {
     private val cacheDir = File(context.filesDir, "curated")
 
-    suspend fun load(source: CuratedSource, forceRefresh: Boolean = false): Result<CuratedPlaylist> =
+    suspend fun load(source: CuratedSource, english: Boolean, forceRefresh: Boolean = false): Result<CuratedPlaylist> =
         withContext(Dispatchers.IO) {
             runCatching {
                 val cached = cacheFile(source)
@@ -71,13 +75,18 @@ class CuratedRepository(
                         }
                     }
                 }
-                toPlaylist(source, text, fetchedAt).withLocalLogos()
+                toPlaylist(source, text, fetchedAt, english).withLocalLogos()
             }
         }
 
     /** Synchronous read of the bundled copy, used for first-run seeding. */
-    fun loadBundled(source: CuratedSource): CuratedPlaylist? =
-        source.assetPath?.let { toPlaylist(source, readAsset(it), null).withLocalLogos() }
+    fun loadBundled(source: CuratedSource, english: Boolean): CuratedPlaylist? =
+        source.assetPath?.let { toPlaylist(source, readAsset(it), null, english).withLocalLogos() }
+
+    /** The same playlist with station and group names in the other language. */
+    fun relabel(playlist: CuratedPlaylist, english: Boolean): CuratedPlaylist =
+        if (playlist.english == english) playlist
+        else toPlaylist(playlist.source, playlist.text, playlist.fetchedAt, english).withLocalLogos()
 
     /**
      * Copies bundled artwork (`asset://` logos) into app storage and points the stations
@@ -124,26 +133,34 @@ class CuratedRepository(
         private const val TAG = "CuratedRepository"
         private val CACHE_TTL_MS = TimeUnit.HOURS.toMillis(24)
 
-        fun toPlaylist(source: CuratedSource, text: String, fetchedAt: Long?): CuratedPlaylist {
+        /**
+         * Builds the stations of a playlist. With [english], names and groups come from the
+         * `x-name-en` and `x-group-en` attributes where an entry has them. Station ids depend
+         * only on the stream URL, so favourites survive a language change.
+         */
+        fun toPlaylist(source: CuratedSource, text: String, fetchedAt: Long?, english: Boolean = false): CuratedPlaylist {
             val entries = M3uPlaylist.parse(text).distinctBy { it.url }
-            val stations = entries.map { it.toStation(source) }
-            val groups = entries.mapNotNull { it.group }.distinct()
+            val stations = entries.map { it.toStation(source, english) }
+            val groups = entries.mapNotNull { it.displayGroup(english) }.distinct()
             val backups = entries.filter { it.attributes["x-role"] == "backup" }
                 .map { CustomStationManager.generateUuidFromUrl(it.url) }
                 .toSet()
-            return CuratedPlaylist(source, stations, groups, fetchedAt, backups)
+            return CuratedPlaylist(source, stations, groups, fetchedAt, backups, english, text)
         }
 
-        private fun M3uEntry.toStation(source: CuratedSource): DataRadioStation {
+        private fun M3uEntry.displayGroup(english: Boolean): String? =
+            (if (english) attributes["x-group-en"]?.trim()?.ifEmpty { null } else null) ?: group
+
+        private fun M3uEntry.toStation(source: CuratedSource, english: Boolean): DataRadioStation {
             return DataRadioStation(
-                Name = title,
+                Name = (if (english) attributes["x-name-en"]?.trim()?.ifEmpty { null } else null) ?: title,
                 StationUuid = CustomStationManager.generateUuidFromUrl(url),
                 StreamUrl = url,
                 IconUrl = logo.orEmpty(),
                 CountryCode = source.countryCode,
                 // The group doubles as the tag line; a non-empty tag is also what
                 // PlayStationTask requires before it records a station in History.
-                TagsAll = group.orEmpty()
+                TagsAll = displayGroup(english).orEmpty()
             )
         }
     }

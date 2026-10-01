@@ -4,17 +4,19 @@ This repository is a personal fork of [AMARadio](https://github.com/ounben/AMARa
 licensed under the GNU GPL v3 like the original. It is a **modified version**: changes started on
 1 October 2026 and are listed below and in the git history.
 
-The fork is published as **Xiangyin (乡音)**: it adds curated Chinese radio playlists with
-designed station artwork, replaces the interface with a Material 3 Expressive design and fixes
-several playback issues, while tracking upstream releases. The full worldwide radio-browser
-catalogue of upstream AMARadio is unchanged (Browse, search, favourites, *Popular worldwide*).
+The fork is published as **Xiangyin (乡音)**: it opens on a list of every country in the
+radio-browser catalogue, adds curated Chinese radio playlists with designed station artwork to
+the China page, replaces the interface with a Material 3 Expressive design in English and
+Chinese, and fixes several playback issues, while tracking upstream releases. The worldwide
+catalogue, search, favourites and upstream's filters are all still there.
 
 ## What is different from upstream
 
 | Area | Change |
 | --- | --- |
 | Identity | Name **Xiangyin / 乡音**, own launcher icon and splash. Package `io.github.bowen_zhang01.amaradio`, version `<upstream>-bz<n>`, version code `upstream * 100 + n`. Installs next to upstream AMARadio. |
-| Home tab | New first tab: greeting, Beijing stations as a carousel, CNR and CRI sections, the most-played stations worldwide, and two community playlists. |
+| World tab | The start screen: shortcuts (*Popular worldwide*, the device's country, China for a Chinese interface, recently opened countries) and every country of the catalogue grouped by continent, with localized names and station counts. A country page lists its stations, most played first. The **China** page starts with the curated playlists (Beijing carousel, CNR and CRI rows, community playlists) and can be narrowed to a province. Search also finds countries. Upstream's station tabs and filters moved behind the filter button. |
+| Languages | English and Simplified Chinese throughout: country and continent names, curated station names (`x-name-en` / `x-group-en` in the playlist), station languages ("chinese" → 中文) and the remaining hard-coded upstream strings. |
 | Design | Material 3 Expressive: dynamic color (wallpaper) with an amber fallback scheme, expressive motion, search app bar, short navigation bar, floating mini player, full player sheet with shape-morphing controls, segmented lists, grouped settings. The player takes its colors from the station artwork (content-based color). |
 | Playback | HLS retry for HLS playlists served from URLs without `.m3u8`, correct relative URL resolution after redirects, fast failure on unrecognized formats, smoothed bandwidth readout. |
 | Misc | Station icon provider authority follows the package name; CJK-aware placeholder labels; themed placeholders; obsolete upstream unit test removed. |
@@ -31,11 +33,22 @@ The two community lists carry no licence, so they are **not** copied into this r
 fetches them from their original location and credits the source.
 
 In the bundled list, entries with `x-role="backup"` are fallback streams (they are not added to
-favourites on first run). Every stream in it was checked by decoding audio on 2026-10-01; to
+favourites on first run), and `x-name-en` / `x-group-en` hold the English station and group names
+shown in a non-Chinese interface. Every stream in it was checked by decoding audio on 2026-10-01; to
 re-check, decode a few seconds of each URL with ffmpeg before committing changes.
 
-On a fresh install the non-backup stations of the bundled list become the initial favourites, so
-widgets, launcher shortcuts and Android Auto are useful immediately.
+On a fresh install with a Chinese interface the non-backup stations of the bundled list become the
+initial favourites, so widgets, launcher shortcuts and Android Auto are useful immediately.
+
+### Countries and regions
+
+Countries, regions and station counts come from the local radio-browser database
+(`StationDao` queries marked as fork additions). Country names are the platform's localized names;
+continents come from a table generated from CLDR territory containment (`fork/world/Countries.kt`).
+The catalogue's `Subcountry` values for China mix pinyin, postal romanization (Kiangsu, Szechuan),
+Chinese and city names, so `assets/curated/cn-regions.json` maps them to the 33 province-level
+divisions for the province chips. Other countries have no region chips yet: their values are too
+inconsistent (Bavaria and Bayern, NSW and New South Wales) to show without a similar table.
 
 ### Branding and artwork
 
@@ -60,20 +73,25 @@ Kept separate so upstream merges rarely conflict:
 
 - `app/fork.gradle` (applied from the last line of `app/build.gradle`): package name, versioning,
   release signing, the material3 1.5 alpha dependency.
-- `app/src/main/kotlin/com/ounben/amaradio/fork/` — curated playlists and the Home screens.
+- `app/src/main/kotlin/com/ounben/amaradio/fork/` — curated playlists (`curated/`), the country
+  catalogue (`world/`) and the World, country and playlist screens (`ui/`).
+- `app/src/main/kotlin/com/ounben/amaradio/database/CatalogCounts.kt` — result types of the
+  country queries.
 - `app/src/main/res/values*/strings_fork.xml`, `colors_fork.xml`, `styles_fork.xml` — all new
   resources (strings in English and Simplified Chinese; app name also in Traditional Chinese).
 - `res/drawable/ic_*xiangyin*`, `res/mipmap-anydpi-v26/ic_launcher_xiangyin*` — generated icons.
-- `app/src/main/assets/curated/` (playlist and artwork), `scripts/` (icon, artwork and release
-  scripts), `.github/workflows/upstream-sync.yml`.
+- `app/src/main/assets/curated/` (playlist, artwork and the China region table), `scripts/` (icon,
+  artwork and release scripts), `.github/workflows/upstream-sync.yml`.
 
 Rewritten upstream files (expect manual merges when upstream changes them): `ui/Theme.kt`,
 `ui/MainScreen.kt`, `ui/MainTopBar.kt`, `ui/PlayerScreens.kt`, `ui/StationComposables.kt`.
 Lightly edited upstream files: `ui/SettingsScreen.kt`, `ui/AboutScreen.kt`, `ui/StationTabContainer.kt`,
 `ui/SettingsViewModel.kt`, `ui/PlayerViewModel.kt`, the colour-only edits in other `ui/` screens,
+the string-resource edits in `ui/ServerInfoScreen.kt`, `ui/Dialogs.kt`, `ui/CategoriesScreen.kt`
+and `ui/FilterViewModel.kt`, the queries appended to `database/StationDao.kt`,
 `players/exoplayer/ExoPlayerWrapper.kt`, `players/exoplayer/IcyDataSource.kt`,
 `utils/StationIconProvider.kt`, `utils/StationPlaceholderUtils.kt`, `AndroidManifest.xml`,
-`res/values/arrays.xml`.
+`res/values/arrays.xml` and one translation fix in `res/values-zh-rCN/strings.xml`.
 
 The interface needs the **material3 1.5 alpha** line: the Compose BOM still pins 1.4.0, which does
 not ship the Expressive components. Move back to the BOM version once 1.5 is stable.
@@ -121,6 +139,19 @@ When upstream changes one of the rewritten UI files, port the behaviour change i
 version instead of taking upstream's layout.
 
 ## Changelog
+
+### 1.40-bz2
+
+- The app opens on **World**: every country of the catalogue by continent, with shortcuts to
+  *Popular worldwide*, your country and recently opened countries. Pick a country to see its
+  stations; China's page holds the curated Beijing, CNR and CRI playlists and province filters.
+- Search also finds countries ("Japan", "日本", "jp").
+- English and Chinese everywhere: English names for the curated stations, localized country,
+  continent and language names, grouped numbers, and the last hard-coded upstream strings.
+- The bottom bar is now World, Favourites, History, Settings; upstream's station tabs and filters
+  open from the filter button on World.
+- Lists mark a station as playing only while it plays, not while paused.
+- A fresh install seeds the Beijing favourites only for a Chinese interface.
 
 ### 1.40-bz1
 
