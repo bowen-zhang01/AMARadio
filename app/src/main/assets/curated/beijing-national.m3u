@@ -1,57 +1,57 @@
 #EXTM3U
-#EXTINF:-1 group-title="北京" tvg-logo="asset://curated/logos/beijing-news.png",北京新闻广播 FM94.5
+#EXTINF:-1 group-title="北京" tvg-logo="asset://curated/logos/beijing-news.png" x-group-en="Beijing" x-name-en="Beijing News Radio FM94.5",北京新闻广播 FM94.5
 https://brtv-radiolive.rbc.cn/alive/fm945.m3u8
-#EXTINF:-1 group-title="北京" tvg-logo="asset://curated/logos/beijing-jjj.png",京津冀之声 FM100.6
+#EXTINF:-1 group-title="北京" tvg-logo="asset://curated/logos/beijing-jjj.png" x-group-en="Beijing" x-name-en="Voice of Jing-Jin-Ji FM100.6",京津冀之声 FM100.6
 https://brtv-radiolive.rbc.cn/alive/fm1006.m3u8
-#EXTINF:-1 group-title="北京" tvg-logo="asset://curated/logos/beijing-traffic.png",北京交通广播 FM103.9
+#EXTINF:-1 group-title="北京" tvg-logo="asset://curated/logos/beijing-traffic.png" x-group-en="Beijing" x-name-en="Beijing Traffic Radio FM103.9",北京交通广播 FM103.9
 https://brtv-radiolive.rbc.cn/alive/fm1039.m3u8
-#EXTINF:-1 group-title="北京" tvg-logo="asset://curated/logos/beijing-music.png",北京音乐广播 FM97.4
+#EXTINF:-1 group-title="北京" tvg-logo="asset://curated/logos/beijing-music.png" x-group-en="Beijing" x-name-en="Beijing Music Radio FM97.4",北京音乐广播 FM97.4
 https://brtv-radiolive.rbc.cn/alive/fm974.m3u8
-#EXTINF:-1 group-title="北京" tvg-logo="asset://curated/logos/beijing-arts.png",北京文艺广播 FM87.6
+#EXTINF:-1 group-title="北京" tvg-logo="asset://curated/logos/beijing-arts.png" x-group-en="Beijing" x-name-en="Beijing Arts Radio FM87.6",北京文艺广播 FM87.6
 https://brtv-radiolive.rbc.cn/alive/fm876.m3u8
-#EXTINF:-1 group-title="北京" tvg-logo="asset://curated/logos/beijing-city.png",北京城市广播 FM102.5（原107.3）
+#EXTINF:-1 group-title="北京" tvg-logo="asset://curated/logos/beijing-city.png" x-group-en="Beijing" x-name-en="Beijing City Radio FM102.5 (formerly 107.3)",北京城市广播 FM102.5（原107.3）
 https://brtv-radiolive.rbc.cn/alive/fm1073.m3u8
-#EXTINF:-1 group-title="北京（备用）" x-role="backup" tvg-logo="asset://curated/logos/beijing-news.png",北京新闻广播（蜻蜓源）
+#EXTINF:-1 group-title="北京（备用）" x-role="backup" tvg-logo="asset://curated/logos/beijing-news.png" x-group-en="Beijing (backup)" x-name-en="Beijing News Radio (Qingting mirror)",北京新闻广播（蜻蜓源）
 https://lhttp.qtfm.cn/live/339/64k.mp3
-#EXTINF:-1 group-title="北京（备用）" x-role="backup" tvg-logo="asset://curated/logos/beijing-jjj.png",京津冀之声（蜻蜓源）
+#EXTINF:-1 group-title="北京（备用）" x-role="backup" tvg-logo="asset://curated/logos/beijing-jjj.png" x-group-en="Beijing (backup)" x-name-en="Voice of Jing-Jin-Ji (Qingting mirror)",京津冀之声（蜻蜓源）
 https://lhttp.qtfm.cn/live/5022463/64k.mp3
-#EXTINF:-1 group-title="北京（备用）" x-role="backup" tvg-logo="asset://curated/logos/beijing-traffic.png",北京交通广播（蜻蜓源）
+#EXTINF:-1 group-title="北京（备用）" x-role="backup" tvg-logo="asset://curated/logos/beijing-traffic.png" x-group-en="Beijing (backup)" x-name-en="Beijing Traffic Radio (Qingting mirror)",北京交通广播（蜻蜓源）
 https://lhttp.qingting.fm/live/336/64k.mp3
-#EXTINF:-1 group-title="北京（备用）" x-role="backup" tvg-logo="asset://curated/logos/beijing-music.png",北京音乐广播（蜻蜓源）
+#EXTINF:-1 group-title="北京（备用）" x-role="backup" tvg-logo="asset://curated/logos/beijing-music.png" x-group-en="Beijing (backup)" x-name-en="Beijing Music Radio (Qingting mirror)",北京音乐广播（蜻蜓源）
 https://lhttp.qtfm.cn/live/332/64k.mp3
-#EXTINF:-1 group-title="北京（备用）" x-role="backup" tvg-logo="asset://curated/logos/beijing-arts.png",北京文艺广播（蜻蜓源）
+#EXTINF:-1 group-title="北京（备用）" x-role="backup" tvg-logo="asset://curated/logos/beijing-arts.png" x-group-en="Beijing (backup)" x-name-en="Beijing Arts Radio (Qingting mirror)",北京文艺广播（蜻蜓源）
 https://lhttp.qtfm.cn/live/333/64k.mp3
-#EXTINF:-1 group-title="北京（备用）" x-role="backup" tvg-logo="asset://curated/logos/beijing-city.png",北京城市广播（蜻蜓源）
+#EXTINF:-1 group-title="北京（备用）" x-role="backup" tvg-logo="asset://curated/logos/beijing-city.png" x-group-en="Beijing (backup)" x-name-en="Beijing City Radio (Qingting mirror)",北京城市广播（蜻蜓源）
 https://lhttp.qtfm.cn/live/345/64k.mp3
-#EXTINF:-1 group-title="中央台" tvg-logo="asset://curated/logos/cnr-china.png",中国之声
+#EXTINF:-1 group-title="中央台" tvg-logo="asset://curated/logos/cnr-china.png" x-group-en="CNR national" x-name-en="CNR Voice of China",中国之声
 https://ngcdn001.cnr.cn/live/zgzs/index.m3u8
-#EXTINF:-1 group-title="中央台" tvg-logo="asset://curated/logos/cnr-economy.png",经济之声
+#EXTINF:-1 group-title="中央台" tvg-logo="asset://curated/logos/cnr-economy.png" x-group-en="CNR national" x-name-en="CNR China Business Radio",经济之声
 https://ngcdn001.cnr.cn/live/jjzs/index.m3u8
-#EXTINF:-1 group-title="中央台" tvg-logo="asset://curated/logos/cnr-music.png",音乐之声
+#EXTINF:-1 group-title="中央台" tvg-logo="asset://curated/logos/cnr-music.png" x-group-en="CNR national" x-name-en="CNR Music Radio",音乐之声
 https://ngcdn001.cnr.cn/live/yyzs/index.m3u8
-#EXTINF:-1 group-title="中央台" tvg-logo="asset://curated/logos/cnr-classic.png",经典音乐广播
+#EXTINF:-1 group-title="中央台" tvg-logo="asset://curated/logos/cnr-classic.png" x-group-en="CNR national" x-name-en="CNR Classical Music Radio",经典音乐广播
 https://ngcdn001.cnr.cn/live/dszs/index.m3u8
-#EXTINF:-1 group-title="中央台" tvg-logo="asset://curated/logos/cnr-arts.png",文艺之声
+#EXTINF:-1 group-title="中央台" tvg-logo="asset://curated/logos/cnr-arts.png" x-group-en="CNR national" x-name-en="CNR Arts Radio",文艺之声
 https://ngcdn001.cnr.cn/live/wyzs/index.m3u8
-#EXTINF:-1 group-title="中央台" tvg-logo="asset://curated/logos/cnr-traffic.png",中国交通广播
+#EXTINF:-1 group-title="中央台" tvg-logo="asset://curated/logos/cnr-traffic.png" x-group-en="CNR national" x-name-en="CNR China Traffic Radio",中国交通广播
 https://ngcdn002.cnr.cn/live/gsgljtgb/index.m3u8
-#EXTINF:-1 group-title="中央台" tvg-logo="asset://curated/logos/cnr-rural.png",中国乡村之声
+#EXTINF:-1 group-title="中央台" tvg-logo="asset://curated/logos/cnr-rural.png" x-group-en="CNR national" x-name-en="CNR China Rural Radio",中国乡村之声
 https://ngcdn001.cnr.cn/live/xczs/index.m3u8
-#EXTINF:-1 group-title="中央台" tvg-logo="asset://curated/logos/cnr-senior.png",老年之声
+#EXTINF:-1 group-title="中央台" tvg-logo="asset://curated/logos/cnr-senior.png" x-group-en="CNR national" x-name-en="CNR Seniors Radio",老年之声
 https://ngcdn001.cnr.cn/live/lnzs/index.m3u8
-#EXTINF:-1 group-title="中央台" tvg-logo="asset://curated/logos/cnr-hongkong.png",香港之声
+#EXTINF:-1 group-title="中央台" tvg-logo="asset://curated/logos/cnr-hongkong.png" x-group-en="CNR national" x-name-en="CNR Voice of Hong Kong",香港之声
 https://ngcdn001.cnr.cn/live/xgzs/index.m3u8
-#EXTINF:-1 group-title="中央台" tvg-logo="asset://curated/logos/cnr-zhonghua.png",中华之声
+#EXTINF:-1 group-title="中央台" tvg-logo="asset://curated/logos/cnr-zhonghua.png" x-group-en="CNR national" x-name-en="CNR Voice of Zhonghua",中华之声
 https://ngcdn001.cnr.cn/live/zhzs/index.m3u8
-#EXTINF:-1 group-title="中央台" tvg-logo="asset://curated/logos/cnr-shenzhou.png",神州之声
+#EXTINF:-1 group-title="中央台" tvg-logo="asset://curated/logos/cnr-shenzhou.png" x-group-en="CNR national" x-name-en="CNR Voice of Shenzhou",神州之声
 https://ngcdn001.cnr.cn/live/szzs/index.m3u8
-#EXTINF:-1 group-title="中央台" tvg-logo="asset://curated/logos/cnr-huaxia.png",华夏之声
+#EXTINF:-1 group-title="中央台" tvg-logo="asset://curated/logos/cnr-huaxia.png" x-group-en="CNR national" x-name-en="CNR Voice of Huaxia",华夏之声
 https://ngcdn001.cnr.cn/live/hxzs/index.m3u8
-#EXTINF:-1 group-title="中央台" tvg-logo="asset://curated/logos/cnr-minzu.png",民族之声
+#EXTINF:-1 group-title="中央台" tvg-logo="asset://curated/logos/cnr-minzu.png" x-group-en="CNR national" x-name-en="CNR Ethnic Minorities Radio",民族之声
 https://ngcdn001.cnr.cn/live/mzzs/index.m3u8
-#EXTINF:-1 group-title="国际台" tvg-logo="asset://curated/logos/cri-global.png",CRI 环球资讯广播
+#EXTINF:-1 group-title="国际台" tvg-logo="asset://curated/logos/cri-global.png" x-group-en="CRI international" x-name-en="CRI Global News Radio",CRI 环球资讯广播
 https://sk.cri.cn/905.m3u8
-#EXTINF:-1 group-title="国际台" tvg-logo="asset://curated/logos/cri-english.png",CGTN Radio / News Plus (English)
+#EXTINF:-1 group-title="国际台" tvg-logo="asset://curated/logos/cri-english.png" x-group-en="CRI international" x-name-en="CGTN Radio / News Plus (English)",CGTN Radio / News Plus (English)
 https://sk.cri.cn/am846.m3u8
-#EXTINF:-1 group-title="国际台" tvg-logo="asset://curated/logos/cri-southsea.png",CRI 南海之声
+#EXTINF:-1 group-title="国际台" tvg-logo="asset://curated/logos/cri-southsea.png" x-group-en="CRI international" x-name-en="CRI Voice of the South China Sea",CRI 南海之声
 https://sk.cri.cn/nhzs.m3u8
