@@ -15,7 +15,7 @@ catalogue, search, favourites and upstream's filters are all still there.
 | Area | Change |
 | --- | --- |
 | Identity | Name **Xiangyin / 乡音**, own launcher icon and splash. Package `io.github.bowen_zhang01.amaradio`, version `<upstream>-bz<n>`, version code `upstream * 100 + n`. Installs next to upstream AMARadio. |
-| World tab | The start screen: shortcuts (*Popular worldwide*, the device's country, China for a Chinese interface, recently opened countries) and every country of the catalogue grouped by continent, with localized names and station counts. A country page lists its stations, most played first. The **China** page starts with the curated playlists (Beijing carousel, CNR and CRI rows, community playlists) and can be narrowed to a province. Search also finds countries. Upstream's station tabs and filters moved behind the filter button. |
+| World tab | The start screen: shortcuts (*Popular worldwide*, the device's country, China for a Chinese interface, recently opened countries) and every country of the catalogue grouped by continent, with localized names and station counts. A country page lists its stations, most played first. The **China** page starts with the curated playlists (Beijing radio carousel, Beijing TV audio, Beijing districts, CNR and CRI rows, playlists) and can be narrowed to a province; *See all* on Beijing opens a Beijing page with the verified streams first and the rest of the catalogue below. Search also finds countries. Upstream's station tabs and filters moved behind the filter button. |
 | Languages | English and Simplified Chinese throughout: country and continent names, curated station names (`x-name-en` / `x-group-en` in the playlist), station languages ("chinese" → 中文) and the remaining hard-coded upstream strings. |
 | Design | Material 3 Expressive: dynamic color (wallpaper) with an amber fallback scheme, expressive motion, search app bar, short navigation bar, floating mini player, full player sheet with shape-morphing controls, segmented lists, grouped settings. The player takes its colors from the station artwork (content-based color). |
 | Playback | HLS retry for HLS playlists served from URLs without `.m3u8`, correct relative URL resolution after redirects, fast failure on unrecognized formats, smoothed bandwidth readout. |
@@ -32,10 +32,13 @@ catalogue, search, favourites and upstream's filters are all still there.
 The two community lists carry no licence, so they are **not** copied into this repository; the app
 fetches them from their original location and credits the source.
 
-In the bundled list, entries with `x-role="backup"` are fallback streams (they are not added to
-favourites on first run), and `x-name-en` / `x-group-en` hold the English station and group names
-shown in a non-Chinese interface. Every stream in it was checked by decoding audio on 2026-10-01; to
-re-check, decode a few seconds of each URL with ffmpeg before committing changes.
+The bundled list has Beijing's six BRTV radio channels (all that BRTV's own live CDN serves), the
+audio of six BTV television channels, four district stations, 13 CNR and 3 CRI channels, and 12
+backup streams. Entries with `x-role="backup"` are fallback streams (listed only in the playlist
+view, never added to favourites), `x-name-en` / `x-group-en` hold the English station and group
+names shown in a non-Chinese interface, and `x-region` (a key of `cn-regions.json`) puts a station
+at the top of that province's list. Every stream in it was checked by decoding audio on 2026-10-01;
+to re-check, decode a few seconds of each URL with ffmpeg before committing changes.
 
 On a fresh install with a Chinese interface the non-backup stations of the bundled list become the
 initial favourites, so widgets, launcher shortcuts and Android Auto are useful immediately.
@@ -45,10 +48,13 @@ initial favourites, so widgets, launcher shortcuts and Android Auto are useful i
 Countries, regions and station counts come from the local radio-browser database
 (`StationDao` queries marked as fork additions). Country names are the platform's localized names;
 continents come from a table generated from CLDR territory containment (`fork/world/Countries.kt`).
-The catalogue's `Subcountry` values for China mix pinyin, postal romanization (Kiangsu, Szechuan),
-Chinese and city names, so `assets/curated/cn-regions.json` maps them to the 33 province-level
-divisions for the province chips. Other countries have no region chips yet: their values are too
-inconsistent (Bavaria and Bayern, NSW and New South Wales) to show without a similar table.
+Chinese stations are assigned to the 33 province-level divisions by `assets/curated/cn-regions.json`
+(`fork/world/ChinaRegions.kt`): a province or city named in the station name wins ("南京交通广播" is
+Jiangsu), otherwise the catalogue's `Subcountry` value, which mixes pinyin, postal romanization
+(Kiangsu, Szechuan), Chinese and city names. National broadcasters (CNR, CRI, CCTV audio) stay
+unassigned and appear under *All*. Province chips follow the administrative-division order, so
+Beijing comes first. Other countries have no region chips yet: their values are too inconsistent
+(Bavaria and Bayern, NSW and New South Wales) to show without a similar table.
 
 ### Branding and artwork
 
@@ -61,8 +67,8 @@ inconsistent (Bavaria and Bayern, NSW and New South Wales) to show without a sim
   logo are generated by `scripts/app-icon/generate.py` — edit the script, not the XML.
 - **Splash**: `ForkSplashTheme` uses the icon's night color, and `SplashActivity` draws the same
   mark at the system splash position, so the Android 12+ splash hands off seamlessly.
-- **Station artwork**: full-bleed tiles for the 22 stations of the bundled playlist (region,
-  short name, frequency or full name on a gradient), generated by `scripts/station-art/generate.py`
+- **Station artwork**: full-bleed tiles for the 32 stations of the bundled playlist (region,
+  short name, frequency, channel or full name on a gradient), generated by `scripts/station-art/generate.py`
   with Noto Sans SC (SIL OFL). Referenced as `tvg-logo="asset://curated/logos/<id>.png"`; the app
   copies them into app storage so notifications, the lock screen and Android Auto show them too.
   They are original designs, not broadcaster logos.
@@ -139,6 +145,16 @@ When upstream changes one of the rewritten UI files, port the behaviour change i
 version instead of taking upstream's layout.
 
 ## Changelog
+
+### 1.40-bz3
+
+- Beijing has far more on the China page: the six BRTV radio channels, plus the audio of six BTV
+  television channels (北京卫视, 新闻, 文艺, 科教, 财经, 生活) and four district stations
+  (延庆, 顺义, 大兴, 怀柔), each verified and with its own artwork.
+- *See all* on Beijing opens a Beijing page: the 16 verified streams first, then every other
+  Beijing station in the catalogue, without the catalogue's copies of the verified streams.
+- Provinces are recognised from station names as well ("苏州新闻广播" → Jiangsu), and the
+  province chips follow the administrative order with Beijing first.
 
 ### 1.40-bz2
 
