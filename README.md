@@ -1,4 +1,4 @@
-> **Fork notice:** this is [bowen-zhang01/AMARadio](https://github.com/bowen-zhang01/AMARadio), a modified version of
+> **Fork notice:** this is **Xiangyin (乡音)**, [bowen-zhang01/AMARadio](https://github.com/bowen-zhang01/AMARadio), a modified version of
 > [ounben/AMARadio](https://github.com/ounben/AMARadio) with curated Chinese radio playlists and a Material 3
 > Expressive interface. See [FORK.md](FORK.md) for the changes, releases and the upstream-sync process.
 
