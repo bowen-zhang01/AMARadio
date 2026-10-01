@@ -175,7 +175,7 @@
 
         <provider
             android:name="com.ounben.amaradio.utils.StationIconProvider"
-            android:authorities="com.ounben.amaradio.stationicons"
+            android:authorities="${applicationId}.stationicons"
             android:exported="true"
             android:grantUriPermissions="true"
             android:directBootAware="true" />
