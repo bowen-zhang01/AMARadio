@@ -37,7 +37,7 @@ class CuratedViewModel(application: Application) : AndroidViewModel(application)
 
     init {
         viewModelScope.launch { seedFavouritesOnFirstRun() }
-        load(CuratedSources.beijingNational)
+        CuratedSources.all.filter { it.isBundled }.forEach { load(it) }
     }
 
     /** Re-labels loaded playlists when the interface language changes. */

@@ -80,6 +80,9 @@ import java.util.Locale
 /** Emoji of the "Popular worldwide" page: the globe showing Asia and Australia. */
 private const val WORLD_EMOJI = "🌏"
 
+/** Emoji of the Chinese underground & indie playlist. */
+private const val UNDERGROUND_EMOJI = "🎧"
+
 /**
  * World tab, the app's start screen: shortcuts to nearby and recent countries, then every
  * country of the catalog grouped by continent.
@@ -88,7 +91,8 @@ private const val WORLD_EMOJI = "🌏"
 @Composable
 fun WorldScreen(
     viewModel: WorldViewModel,
-    onOpenCountry: (String) -> Unit
+    onOpenCountry: (String) -> Unit,
+    onOpenPlaylist: (CuratedSource) -> Unit
 ) {
     val state by viewModel.uiState.collectAsState()
     var continent by rememberSaveable { mutableStateOf<Continent?>(null) }
@@ -120,7 +124,7 @@ fun WorldScreen(
             ) {
                 item(key = "header") { WorldHeader(countryCount = state.countries.size, stationCount = state.totalStations) }
                 item(key = "shortcuts") {
-                    ShortcutRow(shortcuts = state.shortcuts, onOpenCountry = onOpenCountry)
+                    ShortcutRow(shortcuts = state.shortcuts, onOpenCountry = onOpenCountry, onOpenPlaylist = onOpenPlaylist)
                 }
                 stickyHeader(key = "continents") {
                     ChoiceChips(
@@ -173,9 +177,12 @@ private fun WorldHeader(countryCount: Int, stationCount: Int) {
     }
 }
 
-/** "Popular worldwide" followed by the device, language and recently opened countries. */
+/**
+ * "Popular worldwide" and the Chinese underground playlist, followed by the device, language
+ * and recently opened countries.
+ */
 @Composable
-private fun ShortcutRow(shortcuts: List<CountryItem>, onOpenCountry: (String) -> Unit) {
+private fun ShortcutRow(shortcuts: List<CountryItem>, onOpenCountry: (String) -> Unit, onOpenPlaylist: (CuratedSource) -> Unit) {
     LazyRow(
         contentPadding = PaddingValues(horizontal = 16.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -186,8 +193,17 @@ private fun ShortcutRow(shortcuts: List<CountryItem>, onOpenCountry: (String) ->
                 emoji = WORLD_EMOJI,
                 title = stringResource(R.string.fork_world_popular_short),
                 subtitle = stringResource(R.string.fork_world_popular_desc_short),
-                highlighted = true,
+                style = ShortcutStyle.Primary,
                 onClick = { onOpenCountry(Countries.WORLD) }
+            )
+        }
+        item(key = CuratedSources.chineseUnderground.id) {
+            ShortcutCard(
+                emoji = UNDERGROUND_EMOJI,
+                title = stringResource(R.string.fork_world_underground_short),
+                subtitle = stringResource(R.string.fork_world_underground_desc_short),
+                style = ShortcutStyle.Tertiary,
+                onClick = { onOpenPlaylist(CuratedSources.chineseUnderground) }
             )
         }
         items(shortcuts, key = { it.code }) { country ->
@@ -195,22 +211,28 @@ private fun ShortcutRow(shortcuts: List<CountryItem>, onOpenCountry: (String) ->
                 emoji = EmojiUtils.getFlagEmoji(country.code).orEmpty(),
                 title = country.name,
                 subtitle = stationCountText(country.stationCount),
-                highlighted = false,
+                style = ShortcutStyle.Plain,
                 onClick = { onOpenCountry(country.code) }
             )
         }
     }
 }
 
+private enum class ShortcutStyle { Primary, Tertiary, Plain }
+
 @Composable
-private fun ShortcutCard(emoji: String, title: String, subtitle: String, highlighted: Boolean, onClick: () -> Unit) {
-    val colors = if (highlighted) {
-        CardDefaults.cardColors(
+private fun ShortcutCard(emoji: String, title: String, subtitle: String, style: ShortcutStyle, onClick: () -> Unit) {
+    val highlighted = style != ShortcutStyle.Plain
+    val colors = when (style) {
+        ShortcutStyle.Primary -> CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer,
             contentColor = MaterialTheme.colorScheme.onPrimaryContainer
         )
-    } else {
-        CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh)
+        ShortcutStyle.Tertiary -> CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+            contentColor = MaterialTheme.colorScheme.onTertiaryContainer
+        )
+        ShortcutStyle.Plain -> CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh)
     }
     Card(onClick = onClick, shape = MaterialTheme.shapes.extraLarge, colors = colors, modifier = Modifier.width(140.dp)) {
         Column(modifier = Modifier.padding(16.dp)) {

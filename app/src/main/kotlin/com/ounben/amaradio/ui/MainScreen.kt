@@ -319,7 +319,11 @@ fun MainScreen(
                     modifier = Modifier.fillMaxSize()
                 ) {
                     composable(Screen.World.route) {
-                        WorldScreen(viewModel = worldViewModel, onOpenCountry = openCountry)
+                        WorldScreen(
+                            viewModel = worldViewModel,
+                            onOpenCountry = openCountry,
+                            onOpenPlaylist = { source -> navController.navigate(Screen.Playlist.routeFor(source.id)) }
+                        )
                     }
                     composable(
                         Screen.Country.route,

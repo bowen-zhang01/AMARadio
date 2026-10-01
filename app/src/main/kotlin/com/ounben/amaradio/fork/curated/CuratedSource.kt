@@ -18,7 +18,7 @@ data class CuratedSource(
     val assetPath: String? = null,
     val updateUrl: String? = null,
     val homepageUrl: String? = null,
-    /** Country assigned to every station of the list (radio-browser style ISO code). */
+    /** Country of the stations (radio-browser style ISO code); entries may override it with `x-country`. */
     val countryCode: String = "CN"
 ) {
     val isBundled: Boolean get() = assetPath != null
@@ -33,6 +33,16 @@ object CuratedSources {
         assetPath = "curated/beijing-national.m3u",
         updateUrl = "https://raw.githubusercontent.com/bowen-zhang01/AMARadio/master/app/src/main/assets/curated/beijing-national.m3u",
         homepageUrl = "https://github.com/bowen-zhang01/AMARadio"
+    )
+
+    val chineseUnderground = CuratedSource(
+        id = "chinese-underground",
+        titleRes = R.string.fork_curated_underground_title,
+        descriptionRes = R.string.fork_curated_underground_desc,
+        assetPath = "curated/chinese-underground.m3u",
+        updateUrl = "https://raw.githubusercontent.com/bowen-zhang01/AMARadio/master/app/src/main/assets/curated/chinese-underground.m3u",
+        homepageUrl = "https://github.com/bowen-zhang01/AMARadio",
+        countryCode = ""
     )
 
     val cnrProvincial = CuratedSource(
@@ -51,7 +61,7 @@ object CuratedSources {
         homepageUrl = "https://github.com/junguler/m3u-radio-music-playlists"
     )
 
-    val all: List<CuratedSource> = listOf(beijingNational, cnrProvincial, chinaChecked)
+    val all: List<CuratedSource> = listOf(beijingNational, chineseUnderground, cnrProvincial, chinaChecked)
 
     fun byId(id: String): CuratedSource? = all.firstOrNull { it.id == id }
 }

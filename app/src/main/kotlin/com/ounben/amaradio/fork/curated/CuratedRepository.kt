@@ -176,7 +176,7 @@ class CuratedRepository(
                 StationUuid = CustomStationManager.generateUuidFromUrl(url),
                 StreamUrl = url,
                 IconUrl = logo.orEmpty(),
-                CountryCode = source.countryCode,
+                CountryCode = attributes["x-country"]?.trim()?.uppercase()?.ifEmpty { null } ?: source.countryCode,
                 // The group doubles as the tag line; a non-empty tag is also what
                 // PlayStationTask requires before it records a station in History.
                 TagsAll = displayGroup(english).orEmpty()
