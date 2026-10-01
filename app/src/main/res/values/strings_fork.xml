@@ -94,4 +94,8 @@
     <string name="fork_world_popular_desc_short">Most played</string>
     <string name="fork_region_verified">Verified streams</string>
     <string name="fork_region_catalog">More stations</string>
+    <string name="fork_curated_underground_title">Chinese underground &amp; indie</string>
+    <string name="fork_curated_underground_desc">Independent and underground music, niche Hong Kong and Taiwan stations, overseas Chinese community radio and international Chinese-language services, each checked by hand</string>
+    <string name="fork_world_underground_short">Underground</string>
+    <string name="fork_world_underground_desc_short">Chinese indie &amp; niche</string>
 </resources>

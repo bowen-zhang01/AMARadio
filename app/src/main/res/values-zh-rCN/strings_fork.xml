@@ -90,4 +90,8 @@
     <string name="fork_world_popular_desc_short">播放最多</string>
     <string name="fork_region_verified">精选 · 已验证</string>
     <string name="fork_region_catalog">更多电台</string>
+    <string name="fork_curated_underground_title">华语地下与独立</string>
+    <string name="fork_curated_underground_desc">独立和地下音乐、港台小众电台、海外华人电台和境外华语广播，逐个验证过</string>
+    <string name="fork_world_underground_short">华语地下</string>
+    <string name="fork_world_underground_desc_short">独立 · 小众</string>
 </resources>

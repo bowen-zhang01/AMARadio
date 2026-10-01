@@ -128,4 +128,41 @@ internal class M3uPlaylistTest {
                 CuratedRepository.streamKey("https://brtv-radiolive.rbc.cn/alive/fm974.m3u8")
         )
     }
+
+    @Test
+    fun everyBundledPlaylistIsWellFormed() {
+        val cjk = Regex("[\\u3400-\\u9fff\\uff08\\uff09]")
+        CuratedSources.all.filter { it.isBundled }.forEach { source ->
+            val text = File("src/main/assets/" + source.assetPath).readText()
+            val playlist = CuratedRepository.toPlaylist(source, text, null)
+            val english = CuratedRepository.toPlaylist(source, text, null, english = true)
+            val label = source.id
+
+            assertTrue(playlist.stations.isNotEmpty(), label)
+            // Some small Taiwanese stations only stream over plain HTTP (the app allows cleartext).
+            assertTrue(playlist.stations.all { it.StreamUrl.startsWith("https://") || it.StreamUrl.startsWith("http://") }, label)
+            assertEquals(playlist.stations.size, playlist.stations.map { it.StationUuid }.toSet().size, label)
+            assertEquals(playlist.stations.size, playlist.stations.map { CuratedRepository.streamKey(it.StreamUrl) }.toSet().size, label)
+            assertTrue(english.stations.none { cjk.containsMatchIn(it.Name) || cjk.containsMatchIn(it.TagsAll) }, label)
+            playlist.stations.forEach { station ->
+                assertTrue(station.IconUrl.startsWith(M3uPlaylist.ASSET_LOGO_SCHEME), "${station.Name} has no artwork")
+                val logo = File("src/main/assets/" + station.IconUrl.removePrefix(M3uPlaylist.ASSET_LOGO_SCHEME))
+                assertTrue(logo.isFile, "missing ${logo.path}")
+            }
+        }
+    }
+
+    @Test
+    fun undergroundPlaylistKeepsPerStationCountries() {
+        val playlist = CuratedRepository.toPlaylist(
+            CuratedSources.chineseUnderground, File("src/main/assets/curated/chinese-underground.m3u").readText(), null
+        )
+
+        assertEquals(44, playlist.stations.size)
+        assertEquals(listOf("地下与独立", "台湾地下電台", "心战与境外广播", "军警渔与公益", "校园电台", "海外华人"), playlist.groups)
+        assertEquals("TW", playlist.stations.first { it.Name == "光華之聲" }.CountryCode)
+        assertEquals("AU", playlist.stations.first { it.Name.startsWith("2CR") }.CountryCode)
+        // Stations without x-country have no flag.
+        assertEquals("", playlist.stations.first { it.Name.startsWith("上海麗都") }.CountryCode)
+    }
 }
