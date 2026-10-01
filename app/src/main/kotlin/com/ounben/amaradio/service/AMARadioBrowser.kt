@@ -39,7 +39,7 @@ class AMARadioBrowser(private val app: AMARadioApp) {
                 .setIsBrowsable(true)
                 .setIsPlayable(false)
                 .setMediaType(MediaMetadata.MEDIA_TYPE_MUSIC)
-                .setTitle(app.resources.getString(R.string.app_name))
+                .setTitle(app.resources.getString(R.string.fork_app_name))
                 .setExtras(Bundle().apply {
                     putInt("androidx.media.utils.extras.CONTENT_TYPE", 1) // Music
                     putInt("android.media.browse.CONTENT_STYLE_BROWSABLE_HINT", 1) // LIST style

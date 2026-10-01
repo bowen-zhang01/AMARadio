@@ -2,6 +2,8 @@
 <!-- Strings added by the bowen-zhang01/AMARadio fork. Kept apart from strings.xml so that
      upstream translation updates merge without conflicts. -->
 <resources>
+    <string name="fork_app_name">Xiangyin</string>
+    <string name="fork_tagline">Radio from home, wherever you are</string>
     <string name="fork_nav_home">Home</string>
     <string name="fork_nav_browse">Browse</string>
 

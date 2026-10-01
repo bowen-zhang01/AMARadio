@@ -51,16 +51,7 @@ fun SettingsScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            if (!uiState.isReviewCompleted) {
-                val app = LocalContext.current.applicationContext as AMARadioApp
-                SettingsClickable(
-                    title = stringResource(app.reviewManager.getLabelRes()),
-                    summary = stringResource(app.reviewManager.getSummaryRes()),
-                    icon = Icons.Default.Star,
-                    onClick = onRateApp
-                )
-                HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp), color = MaterialTheme.colorScheme.outline.copy(alpha = 0.1f))
-            }
+            // Upstream's "rate AMARadio" prompt is not shown: this build is renamed (see FORK.md).
 
             // Database info
             SettingsCategory(title = stringResource(R.string.database_summary_title)) {

@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="fork_app_name">乡音</string>
+    <string name="fork_tagline">海上生明月，天涯共此时</string>
     <string name="fork_nav_home">精选</string>
     <string name="fork_nav_browse">发现</string>
 

@@ -737,7 +737,7 @@ class PlayerService : MediaLibraryService(), RadioPlayer.PlayerListener {
         builder.setTicker(theTicker)
         builder.setCategory(NotificationCompat.CATEGORY_TRANSPORT)
         builder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-        builder.setSmallIcon(R.drawable.ic_play_arrow_24dp)
+        builder.setSmallIcon(R.drawable.ic_stat_xiangyin)
         builder.setLargeIcon(currentStationBitmap) // For compatibility with some vendor UIs
         builder.addAction(R.drawable.ic_stop_24dp, getString(R.string.action_stop), pendingIntentStop)
         builder.addAction(R.drawable.ic_skip_previous_24dp, getString(R.string.action_skip_to_previous), pendingIntentPrevious)

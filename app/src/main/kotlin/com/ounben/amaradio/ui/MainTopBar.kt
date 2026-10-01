@@ -1,6 +1,8 @@
 package com.ounben.amaradio.ui
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.clearText
@@ -38,6 +40,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.ounben.amaradio.R
@@ -102,6 +105,13 @@ fun MainSearchTopBar(
     AppBarWithSearch(
         state = searchBarState,
         inputField = inputField,
+        navigationIcon = {
+            Image(
+                painter = painterResource(R.drawable.ic_xiangyin_logo),
+                contentDescription = stringResource(R.string.fork_app_name),
+                modifier = Modifier.padding(start = 4.dp, end = 4.dp).size(36.dp)
+            )
+        },
         actions = {
             CastButton()
             if (showFilter) {

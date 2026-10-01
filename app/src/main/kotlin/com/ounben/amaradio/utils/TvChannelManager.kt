@@ -62,8 +62,8 @@ class TvChannelManager(val app: AMARadioApp) {
 
     private fun createDefaultChannel(): Long = try {
         val channel = with(PreviewChannel.Builder()) {
-            setDisplayName(app.getString(R.string.app_name))
-            setDescription(app.getString(R.string.app_name))
+            setDisplayName(app.getString(R.string.fork_app_name))
+            setDescription(app.getString(R.string.fork_app_name))
             setAppLinkIntent(Intent(app, ActivityMain::class.java))
             AppCompatResources.getDrawable(app, R.mipmap.ic_elgato_launcher)?.toBitmap()?.also { logo ->
                 setLogo(logo)

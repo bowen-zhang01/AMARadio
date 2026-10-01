@@ -115,7 +115,7 @@ fun PlayerSelectorDialogCompose(
         text = {
             Column {
                 ListItem(
-                    headlineContent = { Text(stringResource(R.string.app_name), color = MaterialTheme.colorScheme.onSurface) },
+                    headlineContent = { Text(stringResource(R.string.fork_app_name), color = MaterialTheme.colorScheme.onSurface) },
                     leadingContent = { 
                         Icon(
                             imageVector = Icons.Default.PlayCircle,
