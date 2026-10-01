@@ -1,0 +1,57 @@
+#EXTM3U
+#EXTINF:-1 group-title="北京",北京新闻广播 FM94.5
+https://brtv-radiolive.rbc.cn/alive/fm945.m3u8
+#EXTINF:-1 group-title="北京",京津冀之声 FM100.6
+https://brtv-radiolive.rbc.cn/alive/fm1006.m3u8
+#EXTINF:-1 group-title="北京",北京交通广播 FM103.9
+https://brtv-radiolive.rbc.cn/alive/fm1039.m3u8
+#EXTINF:-1 group-title="北京",北京音乐广播 FM97.4
+https://brtv-radiolive.rbc.cn/alive/fm974.m3u8
+#EXTINF:-1 group-title="北京",北京文艺广播 FM87.6
+https://brtv-radiolive.rbc.cn/alive/fm876.m3u8
+#EXTINF:-1 group-title="北京",北京城市广播 FM102.5（原107.3）
+https://brtv-radiolive.rbc.cn/alive/fm1073.m3u8
+#EXTINF:-1 group-title="北京（备用）" x-role="backup",北京新闻广播（蜻蜓源）
+https://lhttp.qtfm.cn/live/339/64k.mp3
+#EXTINF:-1 group-title="北京（备用）" x-role="backup",京津冀之声（蜻蜓源）
+https://lhttp.qtfm.cn/live/5022463/64k.mp3
+#EXTINF:-1 group-title="北京（备用）" x-role="backup",北京交通广播（蜻蜓源）
+https://lhttp.qingting.fm/live/336/64k.mp3
+#EXTINF:-1 group-title="北京（备用）" x-role="backup",北京音乐广播（蜻蜓源）
+https://lhttp.qtfm.cn/live/332/64k.mp3
+#EXTINF:-1 group-title="北京（备用）" x-role="backup",北京文艺广播（蜻蜓源）
+https://lhttp.qtfm.cn/live/333/64k.mp3
+#EXTINF:-1 group-title="北京（备用）" x-role="backup",北京城市广播（蜻蜓源）
+https://lhttp.qtfm.cn/live/345/64k.mp3
+#EXTINF:-1 group-title="中央台",中国之声
+https://ngcdn001.cnr.cn/live/zgzs/index.m3u8
+#EXTINF:-1 group-title="中央台",经济之声
+https://ngcdn001.cnr.cn/live/jjzs/index.m3u8
+#EXTINF:-1 group-title="中央台",音乐之声
+https://ngcdn001.cnr.cn/live/yyzs/index.m3u8
+#EXTINF:-1 group-title="中央台",经典音乐广播
+https://ngcdn001.cnr.cn/live/dszs/index.m3u8
+#EXTINF:-1 group-title="中央台",文艺之声
+https://ngcdn001.cnr.cn/live/wyzs/index.m3u8
+#EXTINF:-1 group-title="中央台",中国交通广播
+https://ngcdn002.cnr.cn/live/gsgljtgb/index.m3u8
+#EXTINF:-1 group-title="中央台",中国乡村之声
+https://ngcdn001.cnr.cn/live/xczs/index.m3u8
+#EXTINF:-1 group-title="中央台",老年之声
+https://ngcdn001.cnr.cn/live/lnzs/index.m3u8
+#EXTINF:-1 group-title="中央台",香港之声
+https://ngcdn001.cnr.cn/live/xgzs/index.m3u8
+#EXTINF:-1 group-title="中央台",中华之声
+https://ngcdn001.cnr.cn/live/zhzs/index.m3u8
+#EXTINF:-1 group-title="中央台",神州之声
+https://ngcdn001.cnr.cn/live/szzs/index.m3u8
+#EXTINF:-1 group-title="中央台",华夏之声
+https://ngcdn001.cnr.cn/live/hxzs/index.m3u8
+#EXTINF:-1 group-title="中央台",民族之声
+https://ngcdn001.cnr.cn/live/mzzs/index.m3u8
+#EXTINF:-1 group-title="国际台",CRI 环球资讯广播
+https://sk.cri.cn/905.m3u8
+#EXTINF:-1 group-title="国际台",CGTN Radio / News Plus (English)
+https://sk.cri.cn/am846.m3u8
+#EXTINF:-1 group-title="国际台",CRI 南海之声
+https://sk.cri.cn/nhzs.m3u8
