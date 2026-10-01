@@ -4,10 +4,8 @@
 <resources>
     <string name="fork_app_name">Xiangyin</string>
     <string name="fork_tagline">Radio from home, wherever you are</string>
-    <string name="fork_nav_home">Home</string>
-    <string name="fork_nav_browse">Browse</string>
 
-    <string name="fork_startup_show_home">Home</string>
+    <string name="fork_startup_show_home">World</string>
     <string name="fork_search_hint">Search stations</string>
     <string name="fork_action_retry">Retry</string>
 
@@ -22,7 +20,6 @@
     <string name="fork_curated_add_all">Add all to favorites</string>
     <string name="fork_curated_added">Added %1$d stations to favorites</string>
     <string name="fork_curated_nothing_added">All stations are already favorites</string>
-    <string name="fork_curated_stations_count">%1$d stations</string>
     <string name="fork_curated_updated">Updated %1$s</string>
     <string name="fork_curated_bundled">Built-in copy</string>
     <string name="fork_curated_refresh">Refresh</string>
@@ -51,15 +48,48 @@
     <string name="fork_settings_pure_black_desc">Black background in dark mode, saves power on OLED screens</string>
 
     <string name="fork_about_title">About this fork</string>
-    <string name="fork_about_notice">This is a modified version of AMARadio by ounben, maintained at github.com/bowen-zhang01/AMARadio since 1 October 2026. It adds curated Chinese playlists and a Material 3 Expressive interface, and follows upstream releases.</string>
+    <string name="fork_about_notice">This is a modified version of AMARadio by ounben, maintained at github.com/bowen-zhang01/AMARadio since 1 October 2026. It opens on a list of every country, adds curated Chinese playlists and a Material 3 Expressive interface, and follows upstream releases.</string>
     <string name="fork_about_fork_repo">Fork source code</string>
     <string name="fork_about_upstream_repo">Original AMARadio</string>
     <string name="fork_home_see_all">See all</string>
-    <string name="fork_home_popular">Popular worldwide</string>
-    <string name="fork_home_browse_more">Browse</string>
     <string name="fork_now_playing">Now playing</string>
     <string name="fork_greeting_morning">Good morning</string>
     <string name="fork_greeting_afternoon">Good afternoon</string>
     <string name="fork_greeting_evening">Good evening</string>
     <string name="fork_greeting_night">Late night radio</string>
+
+    <string name="fork_nav_world">World</string>
+    <string name="fork_world_summary">%1$s countries and regions · %2$s stations</string>
+    <string name="fork_world_popular">Popular worldwide</string>
+    <string name="fork_world_popular_desc">Most played stations</string>
+    <string name="fork_world_catalog_empty">The station catalog isn\'t ready yet</string>
+    <string name="fork_world_catalog_empty_desc">It downloads in the background while you are online. Try again in a moment.</string>
+    <string name="fork_continent_asia">Asia</string>
+    <string name="fork_continent_europe">Europe</string>
+    <string name="fork_continent_north_america">North America</string>
+    <string name="fork_continent_south_america">South America</string>
+    <string name="fork_continent_oceania">Oceania</string>
+    <string name="fork_continent_africa">Africa</string>
+    <string name="fork_continent_other">Other</string>
+    <string name="fork_country_all_stations">All stations</string>
+    <string name="fork_country_no_stations">No stations here yet</string>
+    <string name="fork_country_truncated">Showing the %1$s most played stations. Search to find the others.</string>
+    <string name="fork_search_countries">Countries and regions</string>
+    <string name="fork_search_stations">Stations</string>
+    <string name="fork_advanced_filters">Advanced filters</string>
+    <plurals name="fork_station_count">
+        <item quantity="one">%1$s station</item>
+        <item quantity="other">%1$s stations</item>
+    </plurals>
+    <plurals name="fork_station_clicks">
+        <item quantity="one">%1$s click</item>
+        <item quantity="other">%1$s clicks</item>
+    </plurals>
+    <string name="fork_no_stations">No stations found</string>
+    <string name="fork_stats_global_api">Global API</string>
+    <string name="fork_stats_refresh">Refresh API stats</string>
+    <string name="fork_stats_no_changes">No recent changes recorded.</string>
+    <string name="fork_proxy_type">Proxy type</string>
+    <string name="fork_world_popular_short">Worldwide</string>
+    <string name="fork_world_popular_desc_short">Most played</string>
 </resources>

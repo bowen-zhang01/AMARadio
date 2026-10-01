@@ -1,5 +1,7 @@
 package com.ounben.amaradio.ui
 
+import com.ounben.amaradio.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
@@ -38,7 +40,7 @@ fun CategoriesScreen(
             ) {
                 Text(text = uiState.error!!, color = MaterialTheme.colorScheme.error)
                 Button(onClick = { url?.let { viewModel.loadCategories(it, searchStyle, singleUseFilter, forceUpdate = true) } }) {
-                    Text("Retry")
+                    Text(stringResource(R.string.fork_action_retry))
                 }
             }
         } else {

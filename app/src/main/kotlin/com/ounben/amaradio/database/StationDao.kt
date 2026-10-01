@@ -85,4 +85,22 @@ interface StationDao {
 
     @Query("SELECT * FROM Station WHERE Url = :url OR UrlCache = :url LIMIT 1")
     suspend fun getStationByUrl(url: String): StationEntity?
+
+    // --- bowen-zhang01 fork: country and region browsing (see FORK.md) ---
+    // A few catalog entries carry lower-case country codes, hence UPPER() and the OR below.
+
+    @Query("SELECT UPPER(CountryCode) AS code, MAX(Country) AS name, COUNT(*) AS count FROM Station WHERE LastCheckOK = 1 AND CountryCode != '' GROUP BY UPPER(CountryCode) ORDER BY count DESC")
+    suspend fun getCountryCounts(): List<CountryCount>
+
+    @Query("SELECT Subcountry AS name, COUNT(*) AS count FROM Station WHERE LastCheckOK = 1 AND (CountryCode = :countryCode OR CountryCode = LOWER(:countryCode)) AND Subcountry != '' GROUP BY Subcountry ORDER BY count DESC")
+    suspend fun getRegionCounts(countryCode: String): List<RegionCount>
+
+    @Query("SELECT * FROM Station WHERE LastCheckOK = 1 AND (CountryCode = :countryCode OR CountryCode = LOWER(:countryCode)) ORDER BY clickcount DESC LIMIT :limit")
+    suspend fun getTopStationsInCountry(countryCode: String, limit: Int): List<StationEntity>
+
+    @Query("SELECT * FROM Station WHERE LastCheckOK = 1 AND (CountryCode = :countryCode OR CountryCode = LOWER(:countryCode)) AND Subcountry IN (:regions) ORDER BY clickcount DESC LIMIT :limit")
+    suspend fun getTopStationsInRegions(countryCode: String, regions: List<String>, limit: Int): List<StationEntity>
+
+    @Query("SELECT * FROM Station WHERE LastCheckOK = 1 ORDER BY clickcount DESC LIMIT :limit")
+    suspend fun getTopStations(limit: Int): List<StationEntity>
 }

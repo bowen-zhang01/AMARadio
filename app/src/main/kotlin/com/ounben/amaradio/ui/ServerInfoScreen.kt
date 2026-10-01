@@ -60,7 +60,7 @@ fun ServerInfoScreen(
             Tab(
                 selected = selectedTabIndex == 0,
                 onClick = { selectedTabIndex = 0 },
-                text = { Text("Global API") }
+                text = { Text(stringResource(R.string.fork_stats_global_api)) }
             )
             Tab(
                 selected = selectedTabIndex == 1,
@@ -123,7 +123,7 @@ fun GlobalStatsTab(uiState: ServerInfoViewModel.ServerInfoUiState, onRefresh: ()
                     ) {
                         Icon(Icons.Default.Refresh, contentDescription = null)
                         Spacer(Modifier.width(8.dp))
-                        Text("Refresh API Stats")
+                        Text(stringResource(R.string.fork_stats_refresh))
                     }
                 }
             }
@@ -189,7 +189,7 @@ fun LocalDbTab(
         if (uiState.recentChanges.isEmpty()) {
             item {
                 Text(
-                    text = "No recent changes recorded.", 
+                    text = stringResource(R.string.fork_stats_no_changes), 
                     style = MaterialTheme.typography.bodyMedium, 
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(horizontal = 16.dp)

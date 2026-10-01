@@ -6,8 +6,6 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.preference.PreferenceManager
 import com.ounben.amaradio.AMARadioApp
-import com.ounben.amaradio.database.AMARadioDatabase
-import com.ounben.amaradio.database.toDataStation
 import com.ounben.amaradio.database.user.AMARadioUserDatabase
 import com.ounben.amaradio.station.DataRadioStation
 import kotlinx.coroutines.Dispatchers
@@ -17,6 +15,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.Locale
 
 data class CuratedSourceState(
     val source: CuratedSource,
@@ -33,27 +32,25 @@ class CuratedViewModel(application: Application) : AndroidViewModel(application)
     private val _sources = MutableStateFlow(CuratedSources.all.associate { it.id to CuratedSourceState(it) })
     val sources: StateFlow<Map<String, CuratedSourceState>> = _sources.asStateFlow()
 
-    /** Most-played stations outside China in the local radio-browser catalog. */
-    private val _popular = MutableStateFlow<List<DataRadioStation>>(emptyList())
-    val popular: StateFlow<List<DataRadioStation>> = _popular.asStateFlow()
+    /** Station names follow the interface: Chinese for a Chinese interface, English otherwise. */
+    private var english = isEnglish(application.resources.configuration.locales[0])
 
     init {
         viewModelScope.launch { seedFavouritesOnFirstRun() }
-        viewModelScope.launch { _popular.value = loadPopularWorldwide() }
         load(CuratedSources.beijingNational)
     }
 
-    private suspend fun loadPopularWorldwide(): List<DataRadioStation> = withContext(Dispatchers.IO) {
-        runCatching {
-            AMARadioDatabase.getDatabase(app).stationDao()
-                .getStationsFiltered(null, null, null, null, null, null, "clickcount", 1)
-                .asSequence()
-                .map { it.toDataStation() }
-                .filter { it.CountryCode != "CN" && it.IconUrl.startsWith("http") }
-                .distinctBy { it.Name.trim().lowercase() }
-                .take(POPULAR_COUNT)
-                .toList()
-        }.getOrDefault(emptyList())
+    /** Re-labels loaded playlists when the interface language changes. */
+    fun setLocale(locale: Locale) {
+        val newEnglish = isEnglish(locale)
+        if (newEnglish == english) return
+        english = newEnglish
+        viewModelScope.launch {
+            _sources.value.values.mapNotNull { it.playlist }.forEach { playlist ->
+                val relabelled = withContext(Dispatchers.IO) { repository.relabel(playlist, newEnglish) }
+                updateSource(playlist.source.id) { it.copy(playlist = relabelled) }
+            }
+        }
     }
 
     fun load(source: CuratedSource, forceRefresh: Boolean = false) {
@@ -63,10 +60,12 @@ class CuratedViewModel(application: Application) : AndroidViewModel(application)
         viewModelScope.launch {
             // Show the copy shipped in the APK at once; the refresh below replaces it if newer.
             if (current.playlist == null && source.isBundled) {
-                val bundled = withContext(Dispatchers.IO) { runCatching { repository.loadBundled(source) }.getOrNull() }
+                val bundled = withContext(Dispatchers.IO) { runCatching { repository.loadBundled(source, english) }.getOrNull() }
                 if (bundled != null) updateSource(source.id) { it.copy(playlist = bundled) }
             }
-            repository.load(source, forceRefresh)
+            repository.load(source, english, forceRefresh)
+                // The language may have changed while the download was running.
+                .map { playlist -> withContext(Dispatchers.IO) { repository.relabel(playlist, english) } }
                 .onSuccess { playlist -> updateSource(source.id) { it.copy(playlist = playlist, isLoading = false) } }
                 .onFailure { e -> updateSource(source.id) { it.copy(isLoading = false, error = e.message ?: e.javaClass.simpleName) } }
         }
@@ -90,17 +89,17 @@ class CuratedViewModel(application: Application) : AndroidViewModel(application)
     }
 
     /**
-     * A fresh install starts with the Beijing + national list as favourites, so widgets,
-     * launcher shortcuts and Android Auto (which all read favourites) are useful at once.
-     * Runs once; never touches an existing favourites list.
+     * A fresh install with a Chinese interface starts with the Beijing + national list as
+     * favourites, so widgets, launcher shortcuts and Android Auto (which all read favourites)
+     * are useful at once. Runs once; never touches an existing favourites list.
      */
     private suspend fun seedFavouritesOnFirstRun() {
         val prefs = PreferenceManager.getDefaultSharedPreferences(app)
         if (prefs.getBoolean(PREF_FAVOURITES_SEEDED, false)) return
         val stations = withContext(Dispatchers.IO) {
             val hasFavourites = AMARadioUserDatabase.getDatabase(app).favoriteDao().getMaxOrder() != null
-            if (hasFavourites) emptyList()
-            else repository.loadBundled(CuratedSources.beijingNational)?.primaryStations.orEmpty()
+            if (hasFavourites || english) emptyList()
+            else repository.loadBundled(CuratedSources.beijingNational, english = false)?.primaryStations.orEmpty()
         }
         if (stations.isNotEmpty()) app.favouriteManager.addMultiple(stations)
         prefs.edit { putBoolean(PREF_FAVOURITES_SEEDED, true) }
@@ -108,6 +107,7 @@ class CuratedViewModel(application: Application) : AndroidViewModel(application)
 
     companion object {
         private const val PREF_FAVOURITES_SEEDED = "fork_curated_favourites_seeded_v1"
-        private const val POPULAR_COUNT = 16
+
+        private fun isEnglish(locale: Locale) = locale.language != "zh"
     }
 }

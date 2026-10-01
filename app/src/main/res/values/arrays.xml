@@ -29,14 +29,12 @@
         <item>@string/fork_startup_show_home</item>
         <item>@string/startup_show_history</item>
         <item>@string/startup_show_favorites</item>
-        <item>@string/startup_show_all_stations</item>
         <item>@string/startup_show_last_view</item>
     </string-array>
     <string-array name="startup_action_entryvalues" translatable="false">
         <item>home</item>
         <item>history</item>
         <item>favorites</item>
-        <item>stations</item>
         <item>last</item>
     </string-array>
 
