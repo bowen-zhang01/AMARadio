@@ -71,5 +71,11 @@ internal class M3uPlaylistTest {
         assertTrue(playlist.stations.all { it.StreamUrl.startsWith("https://") })
         assertTrue(playlist.stations.all { it.TagsAll.isNotEmpty() })
         assertEquals(playlist.stations.size, playlist.stations.map { it.StationUuid }.toSet().size)
+        // Every station has bundled artwork that actually exists.
+        playlist.stations.forEach { station ->
+            assertTrue(station.IconUrl.startsWith(M3uPlaylist.ASSET_LOGO_SCHEME), station.Name)
+            val logo = File("src/main/assets/" + station.IconUrl.removePrefix(M3uPlaylist.ASSET_LOGO_SCHEME))
+            assertTrue(logo.isFile, "missing ${logo.path}")
+        }
     }
 }

@@ -22,6 +22,9 @@ data class M3uEntry(
  */
 object M3uPlaylist {
 
+    /** `tvg-logo="asset://curated/logos/x.png"` refers to an image bundled in the APK. */
+    const val ASSET_LOGO_SCHEME = "asset://"
+
     private val attributeRegex = Regex("""([A-Za-z0-9_-]+)="([^"]*)"""")
 
     fun parse(text: String): List<M3uEntry> {
@@ -52,7 +55,8 @@ object M3uPlaylist {
                         title = title,
                         url = line,
                         group = group,
-                        logo = pendingAttributes["tvg-logo"]?.trim()?.takeIf { isStreamUrl(it) },
+                        logo = pendingAttributes["tvg-logo"]?.trim()
+                            ?.takeIf { isStreamUrl(it) || it.startsWith(ASSET_LOGO_SCHEME) },
                         attributes = pendingAttributes
                     )
                     pendingTitle = null

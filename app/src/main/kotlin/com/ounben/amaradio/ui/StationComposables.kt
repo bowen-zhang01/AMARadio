@@ -140,6 +140,9 @@ fun StationIcon(
         }
     }
 
+    // Full-bleed artwork bundled with the curated playlists fills its shape; other logos
+    // are inset and fitted on white, as most broadcaster logos expect.
+    val isArtwork = iconUrl?.contains("/curated_logos/") == true
     var showPlaceholder by remember(model) { mutableStateOf(true) }
 
     val imageRequest = remember(model, stationUuid) {
@@ -189,8 +192,8 @@ fun StationIcon(
             AsyncImage(
                 model = imageRequest,
                 contentDescription = null,
-                modifier = Modifier.fillMaxSize().padding(maxWidth * 0.06f),
-                contentScale = ContentScale.Fit,
+                modifier = if (isArtwork) Modifier.fillMaxSize() else Modifier.fillMaxSize().padding(maxWidth * 0.06f),
+                contentScale = if (isArtwork) ContentScale.Crop else ContentScale.Fit,
                 onState = { state -> showPlaceholder = state !is AsyncImagePainter.State.Success }
             )
         }

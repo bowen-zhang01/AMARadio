@@ -1,6 +1,7 @@
 package com.ounben.amaradio.fork.curated
 
 import android.content.Context
+import android.net.Uri
 import android.util.Log
 import com.ounben.amaradio.CustomStationManager
 import com.ounben.amaradio.station.DataRadioStation
@@ -70,13 +71,37 @@ class CuratedRepository(
                         }
                     }
                 }
-                toPlaylist(source, text, fetchedAt)
+                toPlaylist(source, text, fetchedAt).withLocalLogos()
             }
         }
 
     /** Synchronous read of the bundled copy, used for first-run seeding. */
     fun loadBundled(source: CuratedSource): CuratedPlaylist? =
-        source.assetPath?.let { toPlaylist(source, readAsset(it), null) }
+        source.assetPath?.let { toPlaylist(source, readAsset(it), null).withLocalLogos() }
+
+    /**
+     * Copies bundled artwork (`asset://` logos) into app storage and points the stations
+     * at the copy. Notifications, Android Auto and the icon provider all read `file://`
+     * icons, which assets cannot offer directly. Copies are refreshed after app updates.
+     */
+    private fun CuratedPlaylist.withLocalLogos(): CuratedPlaylist {
+        val logoDir = File(context.filesDir, "curated_logos")
+        val appUpdatedAt = runCatching {
+            context.packageManager.getPackageInfo(context.packageName, 0).lastUpdateTime
+        }.getOrDefault(0L)
+        val resolved = stations.map { station ->
+            val logo = station.IconUrl
+            if (!logo.startsWith(M3uPlaylist.ASSET_LOGO_SCHEME)) return@map station
+            val assetPath = logo.removePrefix(M3uPlaylist.ASSET_LOGO_SCHEME)
+            val target = File(logoDir, assetPath.substringAfterLast('/'))
+            val available = (target.exists() && target.lastModified() >= appUpdatedAt) || runCatching {
+                logoDir.mkdirs()
+                context.assets.open(assetPath).use { input -> target.outputStream().use { input.copyTo(it) } }
+            }.isSuccess
+            station.copy(IconUrl = if (available) Uri.fromFile(target).toString() else "")
+        }
+        return copy(stations = resolved)
+    }
 
     private fun download(url: String): String? = try {
         val request = Request.Builder().url(url).header("User-Agent", "AMARadio").build()
@@ -110,13 +135,6 @@ class CuratedRepository(
         }
 
         private fun M3uEntry.toStation(source: CuratedSource): DataRadioStation {
-            val lowerUrl = url.lowercase()
-            val codec = when {
-                ".m3u8" in lowerUrl -> "HLS"
-                lowerUrl.substringBefore('?').endsWith(".mp3") -> "MP3"
-                lowerUrl.substringBefore('?').endsWith(".aac") -> "AAC"
-                else -> ""
-            }
             return DataRadioStation(
                 Name = title,
                 StationUuid = CustomStationManager.generateUuidFromUrl(url),
@@ -125,8 +143,7 @@ class CuratedRepository(
                 CountryCode = source.countryCode,
                 // The group doubles as the tag line; a non-empty tag is also what
                 // PlayStationTask requires before it records a station in History.
-                TagsAll = group.orEmpty(),
-                Codec = codec
+                TagsAll = group.orEmpty()
             )
         }
     }
