@@ -88,12 +88,12 @@ fun SettingsScreen(
                         onClick = { serverInfoViewModel.triggerManualSync() },
                         modifier = Modifier.fillMaxWidth(),
                         enabled = !serverInfoUiState.isSyncing,
-                        colors = ButtonDefaults.buttonColors(containerColor = AmaradioAmber)
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                     ) {
                         if (serverInfoUiState.isSyncing) {
                             CircularProgressIndicator(
                                 modifier = Modifier.size(18.dp),
-                                color = Color.White,
+                                color = MaterialTheme.colorScheme.onPrimary,
                                 strokeWidth = 2.dp
                             )
                         } else {
@@ -115,6 +115,7 @@ fun SettingsScreen(
                     icon = Icons.Default.Monitor,
                     onValueChange = { viewModel.updateString("theme_name", it) }
                 )
+                ForkAppearanceSwitches()
                 SettingsListPreference(
                     title = stringResource(R.string.settings_ui_scale),
                     currentValue = uiState.uiScaleLevel,
@@ -216,16 +217,20 @@ fun SettingsScreen(
 
 @Composable
 fun SettingsCategory(title: String, content: @Composable ColumnScope.() -> Unit) {
-    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+    Column {
         Text(
             text = title,
-            style = MaterialTheme.typography.titleSmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(bottom = 4.dp)
+            style = MaterialTheme.typography.labelLarge,
+            color = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.padding(start = 16.dp, bottom = 8.dp)
         )
-        content()
-        HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp), color = MaterialTheme.colorScheme.outline.copy(alpha = 0.1f))
+        // Material 3 Expressive grouped list: one rounded tonal container per category.
+        Surface(
+            shape = MaterialTheme.shapes.extraLarge,
+            color = MaterialTheme.colorScheme.surfaceContainer
+        ) {
+            Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp), content = content)
+        }
     }
 }
 
@@ -348,7 +353,7 @@ fun SettingsListPreference(
                                     selected = (index == currentIndex),
                                     onClick = null,
                                     colors = RadioButtonDefaults.colors(
-                                        selectedColor = AmaradioAmber,
+                                        selectedColor = MaterialTheme.colorScheme.primary,
                                         unselectedColor = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
                                 )
@@ -366,11 +371,7 @@ fun SettingsListPreference(
             confirmButton = {
                 Button(
                     onClick = { showDialog = false },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.White,
-                        contentColor = Color.Black
-                    ),
-                    shape = RoundedCornerShape(8.dp)
+                    colors = ButtonDefaults.filledTonalButtonColors(),
                 ) {
                     Text(
                         text = stringResource(R.string.action_cancel),
@@ -380,4 +381,35 @@ fun SettingsListPreference(
             }
         )
     }
+}
+
+/** Fork-only appearance options; read by AMARadioTheme, which recomposes on change. */
+@Composable
+private fun ForkAppearanceSwitches() {
+    val context = LocalContext.current
+    val prefs = remember { androidx.preference.PreferenceManager.getDefaultSharedPreferences(context) }
+    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+        var dynamicColor by remember { mutableStateOf(prefs.getBoolean(PREF_DYNAMIC_COLOR, true)) }
+        SettingsSwitch(
+            title = stringResource(R.string.fork_settings_dynamic_color),
+            summary = stringResource(R.string.fork_settings_dynamic_color_desc),
+            checked = dynamicColor,
+            icon = Icons.Default.Palette,
+            onCheckedChange = {
+                dynamicColor = it
+                prefs.edit().putBoolean(PREF_DYNAMIC_COLOR, it).apply()
+            }
+        )
+    }
+    var pureBlack by remember { mutableStateOf(prefs.getBoolean(PREF_PURE_BLACK, false)) }
+    SettingsSwitch(
+        title = stringResource(R.string.fork_settings_pure_black),
+        summary = stringResource(R.string.fork_settings_pure_black_desc),
+        checked = pureBlack,
+        icon = Icons.Default.DarkMode,
+        onCheckedChange = {
+            pureBlack = it
+            prefs.edit().putBoolean(PREF_PURE_BLACK, it).apply()
+        }
+    )
 }

@@ -65,8 +65,8 @@ fun SleepTimerDialog(onDismiss: () -> Unit) {
                     valueRange = 1f..120f,
                     steps = 119,
                     colors = SliderDefaults.colors(
-                        thumbColor = AmaradioAmber,
-                        activeTrackColor = AmaradioAmber,
+                        thumbColor = MaterialTheme.colorScheme.primary,
+                        activeTrackColor = MaterialTheme.colorScheme.primary,
                         inactiveTrackColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
                     )
                 )
@@ -80,8 +80,7 @@ fun SleepTimerDialog(onDismiss: () -> Unit) {
                     sharedPref.edit { putInt("sleep_timer_default_minutes", sliderValue.toInt()) }
                     onDismiss()
                 },
-                colors = ButtonDefaults.buttonColors(containerColor = Color.White, contentColor = Color.Black),
-                shape = RoundedCornerShape(8.dp)
+                colors = ButtonDefaults.filledTonalButtonColors(),
             ) {
                 Text(stringResource(R.string.sleep_timer_apply), fontWeight = FontWeight.Bold)
             }
@@ -92,8 +91,7 @@ fun SleepTimerDialog(onDismiss: () -> Unit) {
                     PlayerServiceUtil.clearTimer()
                     onDismiss()
                 },
-                colors = ButtonDefaults.buttonColors(containerColor = Color.White, contentColor = Color.Black),
-                shape = RoundedCornerShape(8.dp)
+                colors = ButtonDefaults.filledTonalButtonColors(),
             ) {
                 Text(stringResource(R.string.sleep_timer_clear), fontWeight = FontWeight.Bold)
             }
@@ -122,7 +120,7 @@ fun PlayerSelectorDialogCompose(
                         Icon(
                             imageVector = Icons.Default.PlayCircle,
                             contentDescription = null,
-                            tint = AmaradioAmber
+                            tint = MaterialTheme.colorScheme.primary
                         ) 
                     },
                     modifier = Modifier.clickable {
@@ -155,8 +153,7 @@ fun PlayerSelectorDialogCompose(
         confirmButton = {
             Button(
                 onClick = onDismiss,
-                colors = ButtonDefaults.buttonColors(containerColor = Color.White, contentColor = Color.Black),
-                shape = RoundedCornerShape(8.dp)
+                colors = ButtonDefaults.filledTonalButtonColors(),
             ) {
                 Text(stringResource(R.string.action_cancel), fontWeight = FontWeight.Bold)
             }
@@ -189,7 +186,7 @@ fun ProxySettingsDialogCompose(onDismiss: () -> Unit) {
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true,
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = AmaradioAmber,
+                        focusedBorderColor = MaterialTheme.colorScheme.primary,
                         unfocusedBorderColor = MaterialTheme.colorScheme.outline,
                         focusedTextColor = MaterialTheme.colorScheme.onSurface,
                         unfocusedTextColor = MaterialTheme.colorScheme.onSurface
@@ -202,7 +199,7 @@ fun ProxySettingsDialogCompose(onDismiss: () -> Unit) {
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true,
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = AmaradioAmber,
+                        focusedBorderColor = MaterialTheme.colorScheme.primary,
                         unfocusedBorderColor = MaterialTheme.colorScheme.outline,
                         focusedTextColor = MaterialTheme.colorScheme.onSurface,
                         unfocusedTextColor = MaterialTheme.colorScheme.onSurface
@@ -219,7 +216,7 @@ fun ProxySettingsDialogCompose(onDismiss: () -> Unit) {
                         modifier = Modifier.fillMaxWidth(),
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = AmaradioAmber,
+                            focusedBorderColor = MaterialTheme.colorScheme.primary,
                             unfocusedBorderColor = MaterialTheme.colorScheme.outline,
                             focusedTextColor = MaterialTheme.colorScheme.onSurface,
                             unfocusedTextColor = MaterialTheme.colorScheme.onSurface
@@ -250,7 +247,7 @@ fun ProxySettingsDialogCompose(onDismiss: () -> Unit) {
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true,
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = AmaradioAmber,
+                        focusedBorderColor = MaterialTheme.colorScheme.primary,
                         unfocusedBorderColor = MaterialTheme.colorScheme.outline,
                         focusedTextColor = MaterialTheme.colorScheme.onSurface,
                         unfocusedTextColor = MaterialTheme.colorScheme.onSurface
@@ -263,7 +260,7 @@ fun ProxySettingsDialogCompose(onDismiss: () -> Unit) {
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true,
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = AmaradioAmber,
+                        focusedBorderColor = MaterialTheme.colorScheme.primary,
                         unfocusedBorderColor = MaterialTheme.colorScheme.outline,
                         focusedTextColor = MaterialTheme.colorScheme.onSurface,
                         unfocusedTextColor = MaterialTheme.colorScheme.onSurface
@@ -282,7 +279,7 @@ fun ProxySettingsDialogCompose(onDismiss: () -> Unit) {
                 if (uiState.isTesting) {
                     LinearProgressIndicator(
                         modifier = Modifier.fillMaxWidth(),
-                        color = AmaradioAmber,
+                        color = MaterialTheme.colorScheme.primary,
                         trackColor = MaterialTheme.colorScheme.surfaceVariant
                     )
                 }
@@ -294,8 +291,7 @@ fun ProxySettingsDialogCompose(onDismiss: () -> Unit) {
                     viewModel.save()
                     onDismiss()
                 },
-                colors = ButtonDefaults.buttonColors(containerColor = Color.White, contentColor = Color.Black),
-                shape = RoundedCornerShape(8.dp)
+                colors = ButtonDefaults.filledTonalButtonColors(),
             ) {
                 Text(stringResource(R.string.action_ok), fontWeight = FontWeight.Bold)
             }
@@ -305,16 +301,14 @@ fun ProxySettingsDialogCompose(onDismiss: () -> Unit) {
                 Button(
                     onClick = { viewModel.testProxy() }, 
                     enabled = !uiState.isTesting,
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.White, contentColor = Color.Black),
-                    shape = RoundedCornerShape(8.dp)
+                    colors = ButtonDefaults.filledTonalButtonColors(),
                 ) {
                     Text(stringResource(R.string.settings_proxy_action_test), fontWeight = FontWeight.Bold)
                 }
                 Spacer(modifier = Modifier.width(8.dp))
                 Button(
                     onClick = onDismiss,
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.White, contentColor = Color.Black),
-                    shape = RoundedCornerShape(8.dp)
+                    colors = ButtonDefaults.filledTonalButtonColors(),
                 ) {
                     Text(stringResource(R.string.action_cancel), fontWeight = FontWeight.Bold)
                 }
@@ -347,7 +341,7 @@ fun StationOptionsDialog(
                             color = MaterialTheme.colorScheme.onSurface
                         ) 
                     },
-                    leadingContent = { Icon(Icons.Default.PlayCircle, contentDescription = null, tint = AmaradioAmber) },
+                    leadingContent = { Icon(Icons.Default.PlayCircle, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
                     modifier = Modifier.clickable {
                         StationActions.playInAMARadio(context, station)
                         onDismiss()
@@ -381,7 +375,7 @@ fun StationOptionsDialog(
                         Icon(
                             imageVector = if (isFavorite) Icons.Default.Star else Icons.Default.StarBorder, 
                             contentDescription = null,
-                            tint = if (isFavorite) AmaradioAmber else MaterialTheme.colorScheme.onSurfaceVariant
+                            tint = if (isFavorite) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
                         ) 
                     },
                     modifier = Modifier.clickable {
@@ -439,8 +433,7 @@ fun StationOptionsDialog(
         confirmButton = {
             Button(
                 onClick = onDismiss,
-                colors = ButtonDefaults.buttonColors(containerColor = Color.White, contentColor = Color.Black),
-                shape = RoundedCornerShape(8.dp)
+                colors = ButtonDefaults.filledTonalButtonColors(),
             ) {
                 Text(stringResource(R.string.action_cancel), fontWeight = FontWeight.Bold)
             }
@@ -497,8 +490,7 @@ fun TrackOptionsDialog(
         confirmButton = {
             Button(
                 onClick = onDismiss,
-                colors = ButtonDefaults.buttonColors(containerColor = Color.White, contentColor = Color.Black),
-                shape = RoundedCornerShape(8.dp)
+                colors = ButtonDefaults.filledTonalButtonColors(),
             ) {
                 Text(stringResource(R.string.action_cancel), fontWeight = FontWeight.Bold)
             }

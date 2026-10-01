@@ -146,7 +146,7 @@ fun CustomStationOptionsDialog(
             Column {
                 ListItem(
                     headlineContent = { Text(stringResource(R.string.detail_play), color = MaterialTheme.colorScheme.onSurface) },
-                    leadingContent = { Icon(Icons.Default.PlayCircle, contentDescription = null, tint = AmaradioAmber) },
+                    leadingContent = { Icon(Icons.Default.PlayCircle, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
                     modifier = Modifier.clickable {
                         StationActions.playInAMARadio(context, station)
                         onDismiss()

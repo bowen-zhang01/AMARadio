@@ -44,8 +44,8 @@ fun HistoryScreen(
         SecondaryScrollableTabRow(
             selectedTabIndex = safeSelectedIndex,
             edgePadding = 16.dp,
-            containerColor = MaterialTheme.colorScheme.secondary,
-            contentColor = MaterialTheme.colorScheme.onSecondary,
+            containerColor = MaterialTheme.colorScheme.surface,
+            contentColor = MaterialTheme.colorScheme.onSurface,
             indicator = {
                 TabRowDefaults.SecondaryIndicator(
                     Modifier.tabIndicatorOffset(safeSelectedIndex),

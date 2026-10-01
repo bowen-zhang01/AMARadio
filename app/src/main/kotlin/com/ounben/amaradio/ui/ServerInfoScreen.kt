@@ -49,11 +49,11 @@ fun ServerInfoScreen(
         SecondaryTabRow(
             selectedTabIndex = selectedTabIndex,
             containerColor = MaterialTheme.colorScheme.surface,
-            contentColor = AmaradioAmber,
+            contentColor = MaterialTheme.colorScheme.primary,
             indicator = {
                 TabRowDefaults.SecondaryIndicator(
                     Modifier.tabIndicatorOffset(selectedTabIndex),
-                    color = AmaradioAmber
+                    color = MaterialTheme.colorScheme.primary
                 )
             }
         ) {
@@ -89,7 +89,7 @@ fun GlobalStatsTab(uiState: ServerInfoViewModel.ServerInfoUiState, onRefresh: ()
         if (uiState.isLoading) {
             CircularProgressIndicator(
                 modifier = Modifier.align(Alignment.Center),
-                color = AmaradioAmber
+                color = MaterialTheme.colorScheme.primary
             )
         } else if (uiState.error != null) {
             Text(text = uiState.error, modifier = Modifier.align(Alignment.Center), color = MaterialTheme.colorScheme.error)
@@ -119,7 +119,7 @@ fun GlobalStatsTab(uiState: ServerInfoViewModel.ServerInfoUiState, onRefresh: ()
                     Button(
                         onClick = onRefresh,
                         modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = AmaradioAmber)
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                     ) {
                         Icon(Icons.Default.Refresh, contentDescription = null)
                         Spacer(Modifier.width(8.dp))
@@ -145,7 +145,7 @@ fun LocalDbTab(
         item {
             Card(
                 modifier = Modifier.fillMaxWidth().padding(16.dp),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh)
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text(stringResource(R.string.database_summary_title), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
@@ -161,12 +161,12 @@ fun LocalDbTab(
                 onClick = onSync,
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
                 enabled = !uiState.isSyncing,
-                colors = ButtonDefaults.buttonColors(containerColor = AmaradioAmber)
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
             ) {
                 if (uiState.isSyncing) {
                     CircularProgressIndicator(
                         modifier = Modifier.size(18.dp),
-                        color = Color.White,
+                        color = MaterialTheme.colorScheme.onPrimary,
                         strokeWidth = 2.dp
                     )
                 } else {
@@ -208,7 +208,7 @@ fun LocalDbTab(
                     Text(
                         text = "Change Time: ${station.LastChangeTime}",
                         style = MaterialTheme.typography.labelSmall,
-                        color = AmaradioAmber,
+                        color = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.padding(start = 72.dp, bottom = 8.dp)
                     )
                     HorizontalDivider(modifier = Modifier.padding(horizontal = 12.dp), thickness = 0.5.dp, color = MaterialTheme.colorScheme.outline)

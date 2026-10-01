@@ -57,7 +57,7 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
         
         // Migration of old localized startup actions to technical keys
         val rawValue = sharedPref.getString("startup_action", null)
-        if (rawValue != null && rawValue.contains("@string") || (rawValue != null && !listOf("history", "favorites", "stations", "last").contains(rawValue))) {
+        if (rawValue != null && rawValue.contains("@string") || (rawValue != null && !listOf("home", "history", "favorites", "stations", "last").contains(rawValue))) {
             val migratedValue = when (rawValue) {
                 app.getString(R.string.startup_show_history) -> "history"
                 app.getString(R.string.startup_show_favorites) -> "favorites"

@@ -1,186 +1,252 @@
 package com.ounben.amaradio.ui
 
+import android.graphics.Bitmap
+import android.net.Uri
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.draganddrop.dragAndDropSource
-import androidx.compose.foundation.draganddrop.dragAndDropTarget
-import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
-import androidx.compose.ui.draganddrop.DragAndDropEvent
-import androidx.compose.ui.draganddrop.DragAndDropTarget
-import androidx.compose.ui.draganddrop.DragAndDropTransferData
-import androidx.compose.ui.draganddrop.mimeTypes
-import androidx.compose.ui.draganddrop.toAndroidDragEvent
-import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.material.icons.filled.DragHandle
-import sh.calvin.reorderable.rememberReorderableLazyListState
-import sh.calvin.reorderable.rememberReorderableLazyGridState
-import sh.calvin.reorderable.ReorderableItem
-import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.zIndex
-import android.content.ClipDescription
-import androidx.compose.ui.input.pointer.pointerInput
-import kotlin.time.Duration.Companion.milliseconds
-import android.content.ClipData
-import androidx.compose.foundation.gestures.scrollBy
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.itemsIndexed
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DragHandle
 import androidx.compose.material.icons.filled.Folder
-import androidx.compose.material.icons.filled.Radio
+import androidx.compose.material.icons.filled.GraphicEq
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.outlined.Radio
 import androidx.compose.material.icons.outlined.StarOutline
-import androidx.compose.material3.*
+import androidx.compose.material.icons.outlined.WifiOff
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.IconToggleButton
+import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.LoadingIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SegmentedListItem
+import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
-import androidx.compose.runtime.*
-import androidx.core.graphics.drawable.toBitmap
+import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.layout.positionInWindow
-import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.lazy.grid.rememberLazyGridState
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.core.graphics.drawable.toBitmap
+import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import coil.compose.AsyncImage
 import coil.compose.AsyncImagePainter
-import coil.request.CachePolicy
 import coil.request.ImageRequest
 import com.ounben.amaradio.R
 import com.ounben.amaradio.data.DataCategory
 import com.ounben.amaradio.history.TrackHistoryEntry
 import com.ounben.amaradio.station.DataRadioStation
 import com.ounben.amaradio.utils.EmojiUtils
-import com.ounben.amaradio.utils.StationIconProvider
 import com.ounben.amaradio.utils.StationPlaceholderUtils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import sh.calvin.reorderable.ReorderableItem
+import sh.calvin.reorderable.rememberReorderableLazyGridState
+import sh.calvin.reorderable.rememberReorderableLazyListState
 import java.io.File
 import java.io.FileOutputStream
-import android.util.Log
-import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.grid.LazyGridState
-import androidx.compose.foundation.lazy.grid.rememberLazyGridState
-import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.layout.LayoutCoordinates
-import androidx.compose.ui.layout.positionInWindow
-import androidx.compose.ui.layout.boundsInWindow
-import androidx.compose.ui.layout.boundsInParent
-import androidx.compose.ui.unit.toSize
-import kotlinx.coroutines.delay
-import kotlin.time.Duration.Companion.milliseconds
 
+/** UUID of the station currently loaded in the player; station lists highlight it. */
+val LocalPlayingStationUuid = compositionLocalOf<String?> { null }
+
+private val ListContentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 24.dp)
+
+/**
+ * Station logo clipped to [shape]. Stations without a logo get a placeholder with their
+ * short name on a tonal container color, so placeholders follow the (dynamic) theme.
+ */
 @Composable
 fun StationIcon(
     stationName: String,
     stationUuid: String,
     iconUrl: String?,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    shape: Shape = MaterialTheme.shapes.medium
 ) {
     val context = LocalContext.current
     val placeholderText = remember(stationName) { StationPlaceholderUtils.extractPlaceholderText(stationName) }
-    val placeholderColor = remember(stationUuid) { Color(StationPlaceholderUtils.getPlaceholderColor(stationUuid)) }
-    
-    val finalIconUri = remember(stationUuid, iconUrl) {
-        val iconDir = File(context.filesDir, "station_icons")
-        val iconFile = File(iconDir, "$stationUuid.jpg")
-        
-        if (!iconUrl.isNullOrBlank() && iconUrl.startsWith("file:/")) {
-            android.net.Uri.parse(iconUrl)
-        } else if (iconFile.exists()) {
-            StationIconProvider.getIconUri(stationUuid, stationName)
-        } else if (!iconUrl.isNullOrBlank() && iconUrl != "null" && iconUrl.startsWith("http")) {
-            android.net.Uri.parse(iconUrl)
-        } else {
-            StationIconProvider.getIconUri(stationUuid, stationName)
+    val colors = MaterialTheme.colorScheme
+    val (placeholderContainer, placeholderContent) = remember(stationUuid, colors) {
+        val pairs = listOf(
+            colors.primaryContainer to colors.onPrimaryContainer,
+            colors.secondaryContainer to colors.onSecondaryContainer,
+            colors.tertiaryContainer to colors.onTertiaryContainer
+        )
+        pairs[(stationUuid.hashCode() and 0x7FFFFFFF) % pairs.size]
+    }
+
+    val iconFile = remember(stationUuid) { File(File(context.filesDir, "station_icons"), "$stationUuid.jpg") }
+    // Only real logos are loaded; stations without one get the themed placeholder below.
+    // station_icons/ is not consulted for them because PlayerService stores its generated
+    // notification placeholders there too. Remote logos rely on Coil's disk cache and are
+    // still copied to station_icons/ for the content provider (notifications, Android Auto).
+    val model: Any? = remember(stationUuid, iconUrl) {
+        when {
+            iconUrl.isNullOrBlank() || iconUrl == "null" -> null
+            iconUrl.startsWith("file:/") -> Uri.parse(iconUrl)
+            iconUrl.startsWith("http") -> iconUrl
+            else -> null
         }
     }
-    
-    var isLoading by remember { mutableStateOf(true) }
-    var isError by remember { mutableStateOf(false) }
 
-    val imageRequest = remember(finalIconUri, stationUuid) {
-        ImageRequest.Builder(context)
-            .data(finalIconUri)
-            .size(512, 512) 
-            .allowHardware(false)
-            .crossfade(true)
-            .listener(
-                onSuccess = { _, result ->
-                    val iconDir = File(context.filesDir, "station_icons")
-                    val iconFile = File(iconDir, "$stationUuid.jpg")
-                    if (!iconFile.exists()) {
+    var showPlaceholder by remember(model) { mutableStateOf(true) }
+
+    val imageRequest = remember(model, stationUuid) {
+        model?.let {
+            ImageRequest.Builder(context)
+                .data(it)
+                .size(512, 512)
+                .allowHardware(false)
+                .crossfade(true)
+                .listener(onSuccess = { _, result ->
+                    if (it is String && !iconFile.exists()) {
                         CoroutineScope(Dispatchers.IO).launch {
                             try {
-                                if (!iconDir.exists()) iconDir.mkdirs()
-                                val bitmap = result.drawable.toBitmap(512, 512, android.graphics.Bitmap.Config.RGB_565)
+                                iconFile.parentFile?.mkdirs()
+                                val bitmap = result.drawable.toBitmap(512, 512, Bitmap.Config.RGB_565)
                                 FileOutputStream(iconFile).use { out ->
-                                    bitmap.compress(android.graphics.Bitmap.CompressFormat.JPEG, 90, out)
+                                    bitmap.compress(Bitmap.CompressFormat.JPEG, 90, out)
                                 }
-                            } catch (_: Exception) { }
+                            } catch (_: Exception) {
+                            }
                         }
                     }
-                }
-            )
-            .build()
+                })
+                .build()
+        }
     }
 
-    Box(
+    BoxWithConstraints(
         modifier = modifier
-            .clip(RoundedCornerShape(8.dp))
-            .background(if (isError || isLoading) placeholderColor else Color.White),
+            .clip(shape)
+            .background(if (showPlaceholder) placeholderContainer else Color.White),
         contentAlignment = Alignment.Center
     ) {
-        if (isLoading || isError) {
+        if (showPlaceholder) {
+            val fontSize = with(LocalDensity.current) {
+                (maxWidth * if (placeholderText.length >= 3) 0.25f else 0.34f).toSp()
+            }
             Text(
                 text = placeholderText,
-                color = Color.White,
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold
+                color = placeholderContent,
+                fontSize = fontSize,
+                fontWeight = FontWeight.SemiBold,
+                maxLines = 1
             )
         }
-        
-        AsyncImage(
-            model = imageRequest,
-            contentDescription = null,
-            modifier = Modifier.fillMaxSize().padding(4.dp),
-            contentScale = ContentScale.Fit,
-            onState = { state ->
-                isLoading = state is AsyncImagePainter.State.Loading
-                isError = state is AsyncImagePainter.State.Error
-            }
-        )
+        if (imageRequest != null) {
+            AsyncImage(
+                model = imageRequest,
+                contentDescription = null,
+                modifier = Modifier.fillMaxSize().padding(maxWidth * 0.06f),
+                contentScale = ContentScale.Fit,
+                onState = { state -> showPlaceholder = state !is AsyncImagePainter.State.Success }
+            )
+        }
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+/** Centered empty / error state used by every station list. */
+@Composable
+fun ListMessage(
+    icon: ImageVector,
+    title: String,
+    modifier: Modifier = Modifier,
+    body: String? = null,
+    action: (@Composable () -> Unit)? = null
+) {
+    Column(
+        modifier = modifier.fillMaxSize().padding(32.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Box(
+            modifier = Modifier
+                .size(72.dp)
+                .clip(MaterialTheme.shapes.extraLarge)
+                .background(MaterialTheme.colorScheme.secondaryContainer),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.onSecondaryContainer)
+        }
+        Spacer(Modifier.height(16.dp))
+        Text(title, style = MaterialTheme.typography.titleMedium, textAlign = TextAlign.Center)
+        if (body != null) {
+            Spacer(Modifier.height(4.dp))
+            Text(
+                body,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center
+            )
+        }
+        if (action != null) {
+            Spacer(Modifier.height(16.dp))
+            action()
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+fun CenteredLoadingIndicator(modifier: Modifier = Modifier) {
+    Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        LoadingIndicator()
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun StationListTemplate(
     stations: List<DataRadioStation>,
@@ -196,36 +262,31 @@ fun StationListTemplate(
     onDeleteClick: ((DataRadioStation) -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
+    val refreshState = rememberPullToRefreshState()
     PullToRefreshBox(
         isRefreshing = isLoading,
         onRefresh = { onRefresh?.invoke() },
-        modifier = modifier.fillMaxSize()
+        state = refreshState,
+        modifier = modifier.fillMaxSize(),
+        indicator = {
+            PullToRefreshDefaults.LoadingIndicator(
+                state = refreshState,
+                isRefreshing = isLoading && stations.isNotEmpty(),
+                modifier = Modifier.align(Alignment.TopCenter)
+            )
+        }
     ) {
-        if (isLoading && stations.isEmpty()) {
-            Box(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator(color = AmaradioAmber)
-            }
-        } else if (error != null) {
-            Column(
-                modifier = Modifier.align(Alignment.Center).background(MaterialTheme.colorScheme.background),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(text = error, color = MaterialTheme.colorScheme.error)
-                if (onRetry != null) {
-                    Button(onClick = onRetry, modifier = Modifier.padding(top = 8.dp)) {
-                        Text("Retry")
-                    }
+        when {
+            isLoading && stations.isEmpty() -> CenteredLoadingIndicator()
+            error != null -> ListMessage(
+                icon = Icons.Outlined.WifiOff,
+                title = error,
+                action = onRetry?.let { retry ->
+                    { FilledTonalButton(onClick = retry) { Text(stringResource(R.string.fork_action_retry)) } }
                 }
-            }
-        } else if (stations.isEmpty()) {
-            Box(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background), contentAlignment = Alignment.Center) {
-                Text(
-                    text = emptyMessage,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-            }
-        } else {
-            StationList(
+            )
+            stations.isEmpty() -> ListMessage(icon = Icons.Outlined.Radio, title = emptyMessage)
+            else -> StationList(
                 stations = stations,
                 isGrid = isGrid,
                 onStationClick = onStationClick,
@@ -251,12 +312,14 @@ fun StationList(
 
     if (isGrid) {
         LazyVerticalGrid(
-            columns = GridCells.Adaptive(140.dp),
-            modifier = modifier.fillMaxSize().background(MaterialTheme.colorScheme.background),
-            contentPadding = PaddingValues(8.dp)
+            columns = GridCells.Adaptive(152.dp),
+            modifier = modifier.fillMaxSize(),
+            contentPadding = ListContentPadding,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             itemsIndexed(
-                items = stations, 
+                items = stations,
                 key = { _, station -> station.StationUuid },
                 contentType = { _, _ -> "station" }
             ) { _, station ->
@@ -270,20 +333,25 @@ fun StationList(
             }
         }
     } else {
-        LazyColumn(modifier = modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
+        LazyColumn(
+            modifier = modifier.fillMaxSize(),
+            contentPadding = ListContentPadding,
+            verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap)
+        ) {
             itemsIndexed(
-                items = stations, 
+                items = stations,
                 key = { _, station -> station.StationUuid },
                 contentType = { _, _ -> "station" }
-            ) { _, station ->
+            ) { index, station ->
                 StationListItem(
                     station = station,
                     isFavorite = isFavorite(station.StationUuid),
                     onClick = { onStationClick(station) },
                     onFavoriteClick = { onFavoriteClick(station) },
-                    onLongClick = { stationWithOptions = station }
+                    onLongClick = { stationWithOptions = station },
+                    index = index,
+                    count = stations.size
                 )
-                HorizontalDivider(modifier = Modifier.padding(horizontal = 12.dp), thickness = 0.5.dp, color = MaterialTheme.colorScheme.outline)
             }
         }
     }
@@ -299,7 +367,7 @@ fun StationList(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun TrackList(
     tracks: LazyPagingItems<TrackHistoryEntry>,
@@ -307,17 +375,30 @@ fun TrackList(
     onTrackLongClick: (TrackHistoryEntry) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val isRefreshing = tracks.loadState.refresh is androidx.paging.LoadState.Loading
-    
+    val isRefreshing = tracks.loadState.refresh is LoadState.Loading
+    val refreshState = rememberPullToRefreshState()
+
     PullToRefreshBox(
         isRefreshing = isRefreshing,
         onRefresh = { tracks.refresh() },
-        modifier = modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)
+        state = refreshState,
+        modifier = modifier.fillMaxSize(),
+        indicator = {
+            PullToRefreshDefaults.LoadingIndicator(
+                state = refreshState,
+                isRefreshing = isRefreshing,
+                modifier = Modifier.align(Alignment.TopCenter)
+            )
+        }
     ) {
-        LazyColumn(modifier = Modifier.fillMaxSize()) {
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = ListContentPadding,
+            verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap)
+        ) {
             items(
                 count = tracks.itemCount,
-                key = { index -> 
+                key = { index ->
                     val track = tracks.peek(index)
                     if (track != null) "${track.uid}_$index" else "placeholder_$index"
                 },
@@ -325,75 +406,78 @@ fun TrackList(
             ) { index ->
                 tracks[index]?.let { track ->
                     TrackListItem(
-                        track = track, 
+                        track = track,
                         onClick = { onTrackClick(track) },
-                        onLongClick = { onTrackLongClick(track) }
+                        onLongClick = { onTrackLongClick(track) },
+                        index = index,
+                        count = tracks.itemCount
                     )
-                    HorizontalDivider(modifier = Modifier.padding(horizontal = 12.dp), thickness = 0.5.dp, color = MaterialTheme.colorScheme.outline)
                 }
             }
         }
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun TrackListItem(
     track: TrackHistoryEntry,
     onClick: () -> Unit,
-    onLongClick: () -> Unit
+    onLongClick: () -> Unit,
+    index: Int = 0,
+    count: Int = 1
 ) {
     val context = LocalContext.current
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .combinedClickable(
-                onClick = onClick,
-                onLongClick = onLongClick
-            )
-            .padding(vertical = 8.dp, horizontal = 12.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Box(modifier = Modifier.size(40.dp), contentAlignment = Alignment.Center) {
+    val displayTitle = track.track.ifBlank { track.title }
+    val displayArtist = if (track.track.isNotBlank()) track.artist else ""
+
+    SegmentedListItem(
+        onClick = onClick,
+        onLongClick = onLongClick,
+        shapes = ListItemDefaults.segmentedShapes(index, count),
+        leadingContent = {
             StationIcon(
                 stationName = track.stationName.ifEmpty { track.stationUuid },
                 stationUuid = track.stationUuid,
                 iconUrl = track.stationIconUrl,
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier.size(44.dp)
             )
-        }
-        Spacer(modifier = Modifier.width(12.dp))
-        Column(modifier = Modifier.weight(1f)) {
-            val displayTitle = track.track.ifBlank { track.title }
-            val displayArtist = if (track.track.isNotBlank()) track.artist else ""
-
+        },
+        supportingContent = if (displayArtist.isNotBlank() && displayArtist != displayTitle) {
+            { Text(displayArtist, maxLines = 1, overflow = TextOverflow.Ellipsis) }
+        } else null,
+        trailingContent = {
             Text(
-                text = displayTitle,
-                style = MaterialTheme.typography.bodyMedium,
-                fontWeight = FontWeight.Bold,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                color = MaterialTheme.colorScheme.onSurface
+                text = track.getFormattedTime(context),
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
-            if (displayArtist.isNotBlank() && displayArtist != displayTitle) {
-                Text(
-                    text = displayArtist,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-            }
         }
-        Text(
-            text = track.getFormattedTime(context),
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+    ) {
+        Text(displayTitle, maxLines = 1, overflow = TextOverflow.Ellipsis)
+    }
+}
+
+@Composable
+private fun FavoriteToggle(isFavorite: Boolean, onFavoriteClick: () -> Unit) {
+    IconToggleButton(
+        checked = isFavorite,
+        onCheckedChange = { onFavoriteClick() },
+        colors = IconButtonDefaults.iconToggleButtonColors(
+            checkedContentColor = MaterialTheme.colorScheme.primary
+        )
+    ) {
+        Icon(
+            imageVector = if (isFavorite) Icons.Filled.Star else Icons.Outlined.StarOutline,
+            contentDescription = stringResource(
+                if (isFavorite) R.string.accessibility_favorite_selected
+                else R.string.accessibility_favorite_not_selected
+            )
         )
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun StationListItem(
     station: DataRadioStation,
@@ -402,14 +486,20 @@ fun StationListItem(
     onFavoriteClick: () -> Unit,
     onLongClick: () -> Unit,
     modifier: Modifier = Modifier,
-    useInternalClickable: Boolean = true,
-    dragHandle: (@Composable (Modifier) -> Unit)? = null
+    @Suppress("UNUSED_PARAMETER") useInternalClickable: Boolean = true,
+    dragHandle: (@Composable (Modifier) -> Unit)? = null,
+    index: Int = 0,
+    count: Int = 1
 ) {
     val context = LocalContext.current
+    val isPlaying = LocalPlayingStationUuid.current == station.StationUuid
     val flagEmoji = remember(station.CountryCode) { EmojiUtils.getFlagEmoji(station.CountryCode) ?: "" }
-    val details = remember(station.ClickCount, station.Votes, station.Language, station.Bitrate, station.Codec) { 
-        station.getShortDetails(context) 
+    val details = remember(station.ClickCount, station.Votes, station.Language, station.Bitrate, station.Codec) {
+        station.getShortDetails(context)
     }
+    val supporting = listOf(flagEmoji, details, station.TagsAll.takeIf { details.isBlank() }.orEmpty())
+        .filter { it.isNotBlank() }
+        .joinToString(" ")
 
     val accessibilityDesc = stringResource(
         R.string.accessibility_station_description,
@@ -417,92 +507,45 @@ fun StationListItem(
         station.Language.ifEmpty { stringResource(R.string.not_applicable) },
         station.TagsAll.ifEmpty { stringResource(R.string.not_applicable) }
     )
-    
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .height(IntrinsicSize.Min)
-            .semantics(mergeDescendants = true) {
-                contentDescription = accessibilityDesc
-            }
-            .padding(vertical = 8.dp, horizontal = 12.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Row(
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxHeight()
-                .then(
-                    if (useInternalClickable) {
-                        Modifier.combinedClickable(
-                            onClick = onClick,
-                            onLongClick = onLongClick
+
+    SegmentedListItem(
+        selected = isPlaying,
+        onClick = onClick,
+        onLongClick = onLongClick,
+        shapes = ListItemDefaults.segmentedShapes(index, count),
+        modifier = modifier.semantics(mergeDescendants = true) { contentDescription = accessibilityDesc },
+        leadingContent = {
+            StationIcon(
+                stationName = station.Name,
+                stationUuid = station.StationUuid,
+                iconUrl = station.IconUrl,
+                modifier = Modifier.size(52.dp)
+            )
+        },
+        supportingContent = if (supporting.isNotBlank() || isPlaying) {
+            {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    if (isPlaying) {
+                        Icon(
+                            Icons.Filled.GraphicEq,
+                            contentDescription = stringResource(R.string.accessibility_playing),
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(16.dp)
                         )
-                    } else Modifier
-                ),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Box(modifier = Modifier.size(44.dp), contentAlignment = Alignment.Center) {
-                StationIcon(
-                    stationName = station.Name,
-                    stationUuid = station.StationUuid,
-                    iconUrl = station.IconUrl,
-                    modifier = Modifier.fillMaxSize()
-                )
-            }
-            Spacer(modifier = Modifier.width(12.dp))
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = station.Name,
-                    style = MaterialTheme.typography.bodyLarge,
-                    fontWeight = FontWeight.Bold,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-                Text(
-                    text = if (flagEmoji.isNotEmpty()) "$flagEmoji $details" else details,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    maxLines = 1
-                )
-                if (station.TagsAll.isNotEmpty()) {
-                    Text(
-                        text = station.TagsAll,
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
+                        Spacer(Modifier.width(4.dp))
+                    }
+                    Text(supporting, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 }
             }
+        } else null,
+        trailingContent = {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                dragHandle?.invoke(Modifier)
+                FavoriteToggle(isFavorite, onFavoriteClick)
+            }
         }
-        
-        if (dragHandle != null) {
-            dragHandle(Modifier.fillMaxHeight())
-        }
-
-        Box(
-            modifier = Modifier
-                .minimumInteractiveComponentSize()
-                .size(48.dp)
-                .combinedClickable(
-                    onClick = { 
-                        if (!isFavorite) onFavoriteClick() 
-                    },
-                    onLongClick = onLongClick
-                ),
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(
-                imageVector = if (isFavorite) Icons.Filled.Star else Icons.Outlined.StarOutline,
-                contentDescription = stringResource(
-                    if (isFavorite) R.string.accessibility_favorite_selected 
-                    else R.string.accessibility_favorite_not_selected
-                ),
-                tint = if (isFavorite) AmaradioAmber else MaterialTheme.colorScheme.onSurface
-            )
-        }
+    ) {
+        Text(station.Name, maxLines = 1, overflow = TextOverflow.Ellipsis)
     }
 }
 
@@ -518,6 +561,7 @@ fun StationGridItem(
     useInternalClickable: Boolean = true,
     dragHandle: (@Composable (Modifier) -> Unit)? = null
 ) {
+    val isPlaying = LocalPlayingStationUuid.current == station.StationUuid
     val accessibilityDesc = stringResource(
         R.string.accessibility_station_description,
         station.Name,
@@ -526,84 +570,69 @@ fun StationGridItem(
     )
 
     Card(
-        modifier = modifier
-            .padding(4.dp)
-            .height(IntrinsicSize.Min)
-            .semantics(mergeDescendants = true) {
-                contentDescription = accessibilityDesc
-            },
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
-        shape = RoundedCornerShape(12.dp)
+        modifier = modifier.semantics(mergeDescendants = true) { contentDescription = accessibilityDesc },
+        shape = MaterialTheme.shapes.large,
+        colors = CardDefaults.cardColors(
+            containerColor = if (isPlaying) MaterialTheme.colorScheme.secondaryContainer
+            else MaterialTheme.colorScheme.surfaceContainer
+        )
     ) {
-        Box(modifier = Modifier.fillMaxWidth()) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .then(
-                        if (useInternalClickable) {
-                            Modifier.combinedClickable(
-                                onClick = onClick,
-                                onLongClick = onLongClick
-                            )
-                        } else Modifier
-                    )
-                    .padding(8.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .then(
+                    if (useInternalClickable) Modifier.combinedClickable(onClick = onClick, onLongClick = onLongClick)
+                    else Modifier
+                )
+                .padding(10.dp)
+        ) {
+            Box {
                 StationIcon(
                     stationName = station.Name,
                     stationUuid = station.StationUuid,
                     iconUrl = station.IconUrl,
-                    modifier = Modifier.size(80.dp)
+                    modifier = Modifier.fillMaxWidth().aspectRatio(1f)
                 )
-                Text(
-                    text = station.Name,
-                    style = MaterialTheme.typography.labelMedium,
-                    fontWeight = FontWeight.Bold,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .heightIn(min = 32.dp),
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-            }
-
-            if (dragHandle != null) {
-                Box(modifier = Modifier.align(Alignment.TopStart)) {
-                    dragHandle(Modifier)
+                Box(modifier = Modifier.align(Alignment.TopEnd)) {
+                    FavoriteToggle(isFavorite, onFavoriteClick)
+                }
+                if (dragHandle != null) {
+                    Box(modifier = Modifier.align(Alignment.TopStart)) { dragHandle(Modifier) }
                 }
             }
-
-            Box(
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .minimumInteractiveComponentSize()
-                    .size(48.dp)
-                    .combinedClickable(
-                        onClick = {
-                            if (!isFavorite) onFavoriteClick()
-                        },
-                        onLongClick = onLongClick
-                    ),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = if (isFavorite) Icons.Filled.Star else Icons.Outlined.StarOutline,
-                    contentDescription = stringResource(
-                        if (isFavorite) R.string.accessibility_favorite_selected 
-                        else R.string.accessibility_favorite_not_selected
-                    ),
-                    tint = if (isFavorite) AmaradioAmber else MaterialTheme.colorScheme.onSurface
+            Spacer(Modifier.height(8.dp))
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                if (isPlaying) {
+                    Icon(
+                        Icons.Filled.GraphicEq,
+                        contentDescription = stringResource(R.string.accessibility_playing),
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(16.dp)
+                    )
+                    Spacer(Modifier.width(4.dp))
+                }
+                Text(
+                    text = station.Name,
+                    style = MaterialTheme.typography.titleSmall,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
                 )
             }
         }
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
+@Composable
+private fun DragHandleIcon(modifier: Modifier) {
+    Box(modifier = modifier.size(48.dp), contentAlignment = Alignment.Center) {
+        Icon(
+            imageVector = Icons.Default.DragHandle,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
+}
+
 @Composable
 fun ReorderableStationList(
     stations: List<DataRadioStation>,
@@ -618,7 +647,7 @@ fun ReorderableStationList(
 ) {
     val stationsLocal = remember { mutableStateListOf<DataRadioStation>() }
     var stationWithOptions by remember { mutableStateOf<DataRadioStation?>(null) }
-    
+
     val listState = rememberLazyListState()
     val gridState = rememberLazyGridState()
 
@@ -629,6 +658,10 @@ fun ReorderableStationList(
         }
     }
 
+    val longClickFor: (DataRadioStation) -> Unit = { station ->
+        if (onLongClick != null) onLongClick(station) else stationWithOptions = station
+    }
+
     if (isGrid) {
         val reorderableState = rememberReorderableLazyGridState(gridState) { from, to ->
             stationsLocal.add(to.index, stationsLocal.removeAt(from.index))
@@ -637,52 +670,28 @@ fun ReorderableStationList(
 
         LazyVerticalGrid(
             state = gridState,
-            columns = GridCells.Adaptive(140.dp),
+            columns = GridCells.Adaptive(152.dp),
             modifier = modifier.fillMaxSize(),
-            contentPadding = PaddingValues(8.dp)
+            contentPadding = ListContentPadding,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            itemsIndexed(stationsLocal, key = { _, s -> s.StationUuid }) { index, station ->
+            itemsIndexed(stationsLocal, key = { _, s -> s.StationUuid }) { _, station ->
                 ReorderableItem(reorderableState, key = station.StationUuid) { isDragging ->
                     val itemScope = this
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(2.dp)
-                            .graphicsLayer {
-                                scaleX = if (isDragging) 1.05f else 1f
-                                scaleY = if (isDragging) 1.05f else 1f
-                                alpha = if (isDragging) 0.8f else 1f
-                            }
-                    ) {
-                        StationGridItem(
-                            station = station,
-                            isFavorite = isFavorite(station.StationUuid),
-                            onClick = { onStationClick(station) },
-                            onFavoriteClick = { onFavoriteClick(station) },
-                            onLongClick = { 
-                                if (onLongClick != null) onLongClick.invoke(station) 
-                                else stationWithOptions = station 
-                            },
-                            useInternalClickable = true,
-                            dragHandle = { dragModifier ->
-                                with(itemScope) {
-                                    Box(
-                                        modifier = dragModifier
-                                            .size(48.dp)
-                                            .draggableHandle(),
-                                        contentAlignment = Alignment.Center
-                                    ) {
-                                        Icon(
-                                            imageVector = Icons.Default.DragHandle,
-                                            contentDescription = null,
-                                            tint = MaterialTheme.colorScheme.onSurface,
-                                            modifier = Modifier.size(24.dp)
-                                        )
-                                    }
-                                }
-                            }
-                        )
-                    }
+                    StationGridItem(
+                        station = station,
+                        isFavorite = isFavorite(station.StationUuid),
+                        onClick = { onStationClick(station) },
+                        onFavoriteClick = { onFavoriteClick(station) },
+                        onLongClick = { longClickFor(station) },
+                        modifier = Modifier.graphicsLayer {
+                            val scale = if (isDragging) 1.05f else 1f
+                            scaleX = scale
+                            scaleY = scale
+                        },
+                        dragHandle = { with(itemScope) { DragHandleIcon(Modifier.draggableHandle()) } }
+                    )
                 }
             }
         }
@@ -695,59 +704,29 @@ fun ReorderableStationList(
         LazyColumn(
             state = listState,
             modifier = modifier.fillMaxSize(),
-            contentPadding = PaddingValues(bottom = 80.dp)
+            contentPadding = ListContentPadding,
+            verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap)
         ) {
             itemsIndexed(stationsLocal, key = { _, s -> s.StationUuid }) { index, station ->
                 ReorderableItem(reorderableState, key = station.StationUuid) { isDragging ->
                     val itemScope = this
-                    val elevation by animateDpAsState(if (isDragging) 8.dp else 0.dp)
-                    
-                    Surface(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .graphicsLayer {
-                                scaleX = if (isDragging) 1.03f else 1f
-                                scaleY = if (isDragging) 1.03f else 1f
-                            },
-                        shadowElevation = elevation,
-                        tonalElevation = elevation
-                    ) {
-                        Column {
-                            StationListItem(
-                                station = station,
-                                isFavorite = isFavorite(station.StationUuid),
-                                onClick = { onStationClick(station) },
-                                onFavoriteClick = { onFavoriteClick(station) },
-                                onLongClick = { 
-                                    if (onLongClick != null) onLongClick.invoke(station) 
-                                    else stationWithOptions = station 
-                                },
-                                useInternalClickable = true,
-                                dragHandle = { dragModifier ->
-                                    with(itemScope) {
-                                        Box(
-                                            modifier = dragModifier
-                                                .width(56.dp)
-                                                .draggableHandle(),
-                                            contentAlignment = Alignment.Center
-                                        ) {
-                                            Icon(
-                                                imageVector = Icons.Default.DragHandle,
-                                                contentDescription = null,
-                                                tint = MaterialTheme.colorScheme.onSurface,
-                                                modifier = Modifier.size(24.dp)
-                                            )
-                                        }
-                                    }
-                                }
-                            )
-                            HorizontalDivider(
-                                modifier = Modifier.padding(horizontal = 12.dp),
-                                thickness = 0.5.dp,
-                                color = MaterialTheme.colorScheme.outline
-                            )
-                        }
-                    }
+                    val lift by animateDpAsState(if (isDragging) 6.dp else 0.dp, label = "drag-lift")
+                    StationListItem(
+                        station = station,
+                        isFavorite = isFavorite(station.StationUuid),
+                        onClick = { onStationClick(station) },
+                        onFavoriteClick = { onFavoriteClick(station) },
+                        onLongClick = { longClickFor(station) },
+                        modifier = Modifier.graphicsLayer {
+                            shadowElevation = lift.toPx()
+                            val scale = if (isDragging) 1.02f else 1f
+                            scaleX = scale
+                            scaleY = scale
+                        },
+                        dragHandle = { with(itemScope) { DragHandleIcon(Modifier.draggableHandle()) } },
+                        index = index,
+                        count = stationsLocal.size
+                    )
                 }
             }
         }
@@ -773,9 +752,11 @@ fun CategoryList(
 ) {
     if (isGrid) {
         LazyVerticalGrid(
-            columns = GridCells.Adaptive(100.dp),
-            modifier = modifier.fillMaxSize().background(MaterialTheme.colorScheme.background),
-            contentPadding = PaddingValues(8.dp)
+            columns = GridCells.Adaptive(112.dp),
+            modifier = modifier.fillMaxSize(),
+            contentPadding = ListContentPadding,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             itemsIndexed(
                 items = categories,
@@ -786,45 +767,50 @@ fun CategoryList(
             }
         }
     } else {
-        LazyColumn(modifier = modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
+        LazyColumn(
+            modifier = modifier.fillMaxSize(),
+            contentPadding = ListContentPadding,
+            verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap)
+        ) {
             itemsIndexed(
                 items = categories,
                 key = { index, category -> "${category.Name}_$index" },
                 contentType = { _, _ -> "category" }
-            ) { _, category ->
-                CategoryListItem(category = category, onClick = { onCategoryClick(category) })
-                HorizontalDivider(modifier = Modifier.padding(horizontal = 12.dp), thickness = 0.5.dp, color = MaterialTheme.colorScheme.outline)
+            ) { index, category ->
+                CategoryListItem(
+                    category = category,
+                    onClick = { onCategoryClick(category) },
+                    index = index,
+                    count = categories.size
+                )
             }
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun CategoryListItem(
     category: DataCategory,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    index: Int = 0,
+    count: Int = 1
 ) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick)
-            .padding(16.dp),
-        verticalAlignment = Alignment.CenterVertically
+    SegmentedListItem(
+        onClick = onClick,
+        shapes = ListItemDefaults.segmentedShapes(index, count),
+        leadingContent = { CategoryIcon(category = category, modifier = Modifier.size(24.dp)) },
+        trailingContent = if (category.UsedCount > 0) {
+            {
+                Text(
+                    text = category.UsedCount.toString(),
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        } else null
     ) {
-        CategoryIcon(category = category, modifier = Modifier.size(24.dp))
-        Spacer(modifier = Modifier.width(16.dp))
-        Text(
-            text = category.Name,
-            style = MaterialTheme.typography.bodyLarge,
-            modifier = Modifier.weight(1f)
-        )
-        if (category.UsedCount > 0) {
-            Text(
-                text = category.UsedCount.toString(),
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        }
+        Text(category.Name, maxLines = 1, overflow = TextOverflow.Ellipsis)
     }
 }
 
@@ -834,22 +820,19 @@ fun CategoryGridItem(
     onClick: () -> Unit
 ) {
     Card(
-        modifier = Modifier
-            .padding(4.dp)
-            .clickable(onClick = onClick),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
-        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
-        shape = RoundedCornerShape(12.dp)
+        onClick = onClick,
+        shape = MaterialTheme.shapes.large,
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer)
     ) {
         Column(
-            modifier = Modifier.padding(12.dp),
+            modifier = Modifier.fillMaxWidth().padding(12.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             CategoryIcon(category = category, modifier = Modifier.size(32.dp))
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = category.Name,
-                style = MaterialTheme.typography.labelSmall,
+                style = MaterialTheme.typography.labelLarge,
                 textAlign = TextAlign.Center,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
@@ -863,7 +846,7 @@ fun CategoryIcon(category: DataCategory, modifier: Modifier = Modifier) {
     val emoji = remember(category.Name) {
         if (category.Name.length == 2) EmojiUtils.getFlagEmoji(category.Name) else null
     }
-    
+
     if (emoji != null) {
         Text(text = emoji, modifier = modifier, textAlign = TextAlign.Center)
     } else {

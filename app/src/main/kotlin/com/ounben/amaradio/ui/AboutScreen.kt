@@ -41,7 +41,7 @@ fun AboutScreen(onBack: () -> Unit) {
         urlRegex.findAll(aboutText).forEach { result ->
             addStyle(
                 style = SpanStyle(
-                    color = AmaradioAmber,
+                    color = MaterialTheme.colorScheme.primary,
                     textDecoration = TextDecoration.Underline,
                     fontWeight = FontWeight.Bold
                 ),
@@ -61,7 +61,7 @@ fun AboutScreen(onBack: () -> Unit) {
         emailRegex.findAll(aboutText).forEach { result ->
             addStyle(
                 style = SpanStyle(
-                    color = AmaradioAmber,
+                    color = MaterialTheme.colorScheme.primary,
                     textDecoration = TextDecoration.Underline,
                     fontWeight = FontWeight.Bold
                 ),
@@ -108,7 +108,7 @@ fun AboutScreen(onBack: () -> Unit) {
             Text(
                 text = stringResource(R.string.app_name),
                 style = MaterialTheme.typography.headlineLarge,
-                color = AmaradioAmber,
+                color = MaterialTheme.colorScheme.primary,
                 fontWeight = FontWeight.Bold
             )
             Text(
@@ -126,7 +126,11 @@ fun AboutScreen(onBack: () -> Unit) {
             )
             
             Spacer(modifier = Modifier.height(24.dp))
-            
+
+            ForkNoticeCard()
+
+            Spacer(modifier = Modifier.height(24.dp))
+
             SelectionContainer {
                 @Suppress("DEPRECATION")
                 ClickableText(
@@ -154,6 +158,33 @@ fun AboutScreen(onBack: () -> Unit) {
                             }
                     }
                 )
+            }
+        }
+    }
+}
+
+/** GPL section 5(a) notice: this build is a modified version of AMARadio. */
+@Composable
+private fun ForkNoticeCard() {
+    val uriHandler = LocalUriHandler.current
+    Surface(
+        shape = MaterialTheme.shapes.extraLarge,
+        color = MaterialTheme.colorScheme.secondaryContainer,
+        contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Column(modifier = Modifier.padding(20.dp)) {
+            Text(stringResource(R.string.fork_about_title), style = MaterialTheme.typography.titleMedium)
+            Spacer(Modifier.height(8.dp))
+            Text(stringResource(R.string.fork_about_notice), style = MaterialTheme.typography.bodyMedium)
+            Spacer(Modifier.height(12.dp))
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                FilledTonalButton(onClick = { runCatching { uriHandler.openUri("https://github.com/bowen-zhang01/AMARadio") } }) {
+                    Text(stringResource(R.string.fork_about_fork_repo))
+                }
+                TextButton(onClick = { runCatching { uriHandler.openUri("https://github.com/ounben/AMARadio") } }) {
+                    Text(stringResource(R.string.fork_about_upstream_repo))
+                }
             }
         }
     }

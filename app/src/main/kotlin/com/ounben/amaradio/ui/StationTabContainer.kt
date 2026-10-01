@@ -14,8 +14,8 @@ fun TabHeader(titleRes: Int) {
     SecondaryScrollableTabRow(
         selectedTabIndex = 0,
         edgePadding = 16.dp,
-        containerColor = MaterialTheme.colorScheme.secondary,
-        contentColor = MaterialTheme.colorScheme.onSecondary,
+        containerColor = MaterialTheme.colorScheme.surface,
+        contentColor = MaterialTheme.colorScheme.onSurface,
         indicator = {
             TabRowDefaults.SecondaryIndicator(
                 Modifier.tabIndicatorOffset(0),
@@ -37,8 +37,8 @@ fun SingleTabContainer(
     titleRes: Int,
     content: @Composable () -> Unit
 ) {
+    // The screen title now lives in the top app bar, so no tab-style header is drawn here.
     Column(modifier = Modifier.fillMaxSize()) {
-        TabHeader(titleRes = titleRes)
         content()
     }
 }
