@@ -65,9 +65,9 @@ internal class M3uPlaylistTest {
         val asset = File("src/main/assets/curated/beijing-national.m3u")
         val playlist = CuratedRepository.toPlaylist(CuratedSources.beijingNational, asset.readText(), null)
 
-        assertEquals(28, playlist.stations.size)
-        assertEquals(6, playlist.backupUuids.size)
-        assertEquals(22, playlist.primaryStations.size)
+        assertEquals(44, playlist.stations.size)
+        assertEquals(12, playlist.backupUuids.size)
+        assertEquals(32, playlist.primaryStations.size)
         assertTrue(playlist.stations.all { it.StreamUrl.startsWith("https://") })
         assertTrue(playlist.stations.all { it.TagsAll.isNotEmpty() })
         assertEquals(playlist.stations.size, playlist.stations.map { it.StationUuid }.toSet().size)
@@ -86,13 +86,46 @@ internal class M3uPlaylistTest {
         val english = CuratedRepository.toPlaylist(CuratedSources.beijingNational, text, null, english = true)
         val cjk = Regex("[\\u3400-\\u9fff\\uff08\\uff09]")
 
-        assertEquals(listOf("北京", "北京（备用）", "中央台", "国际台"), chinese.groups)
-        assertEquals(listOf("Beijing", "Beijing (backup)", "CNR national", "CRI international"), english.groups)
+        assertEquals(listOf("北京", "北京电视伴音", "北京各区", "中央台", "国际台", "北京（备用）"), chinese.groups)
+        assertEquals(
+            listOf("Beijing", "Beijing TV audio", "Beijing districts", "CNR national", "CRI international", "Beijing (backup)"),
+            english.groups
+        )
         assertTrue(english.stations.none { cjk.containsMatchIn(it.Name) || cjk.containsMatchIn(it.TagsAll) })
         // Same stations and ids in both languages, so favourites survive a language switch.
         assertEquals(chinese.stations.map { it.StationUuid }, english.stations.map { it.StationUuid })
         assertEquals(chinese.backupUuids, english.backupUuids)
         assertEquals("北京新闻广播 FM94.5", chinese.stations.first().Name)
         assertEquals("Beijing News Radio FM94.5", english.stations.first().Name)
+    }
+
+    @Test
+    fun beijingStationsCarryTheirRegion() {
+        val playlist = CuratedRepository.toPlaylist(
+            CuratedSources.beijingNational, File("src/main/assets/curated/beijing-national.m3u").readText(), null
+        )
+
+        val beijing = playlist.primaryStationsIn("beijing")
+        assertEquals(16, beijing.size)
+        assertEquals(setOf("北京", "北京电视伴音", "北京各区"), beijing.map { it.TagsAll }.toSet())
+        // National stations have no region; backups are never listed.
+        assertTrue(playlist.primaryStations.filter { it.TagsAll == "中央台" }.none { it.StationUuid in playlist.regions })
+        assertTrue(beijing.none { it.StationUuid in playlist.backupUuids })
+    }
+
+    @Test
+    fun streamKeysIgnoreSchemeQueryAndQingtingHost() {
+        assertEquals(
+            CuratedRepository.streamKey("https://lhttp.qtfm.cn/live/5021739/64k.mp3"),
+            CuratedRepository.streamKey("http://lhttp.qingting.fm/live/5021739/64k.mp3")
+        )
+        assertEquals(
+            CuratedRepository.streamKey("https://pili-live-hls-bjhr-tv.huairtv.com/bjhr-tv/FM101.m3u8"),
+            CuratedRepository.streamKey("https://pili-live-hls-bjhr-tv.huairtv.com/bjhr-tv/FM101.m3u8?sign=7f85&t=69bb")
+        )
+        assertTrue(
+            CuratedRepository.streamKey("https://brtv-radiolive.rbc.cn/alive/fm945.m3u8") !=
+                CuratedRepository.streamKey("https://brtv-radiolive.rbc.cn/alive/fm974.m3u8")
+        )
     }
 }

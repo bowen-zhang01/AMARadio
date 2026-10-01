@@ -21,6 +21,8 @@ data class CuratedPlaylist(
     val fetchedAt: Long?,
     /** Stations marked `x-role="backup"`: alternative streams of another entry. */
     val backupUuids: Set<String> = emptySet(),
+    /** Region key (as in `cn-regions.json`) per station id, from `x-region="…"`. */
+    val regions: Map<String, String> = emptyMap(),
     /** Whether names come from the `x-name-en` / `x-group-en` attributes. */
     val english: Boolean = false,
     /** The M3U text, kept to re-label the stations when the interface language changes. */
@@ -28,6 +30,10 @@ data class CuratedPlaylist(
 ) {
     val primaryStations: List<DataRadioStation>
         get() = stations.filterNot { it.StationUuid in backupUuids }
+
+    /** Non-backup stations of one region, in playlist order. */
+    fun primaryStationsIn(region: String): List<DataRadioStation> =
+        primaryStations.filter { regions[it.StationUuid] == region }
 }
 
 /**
@@ -145,8 +151,21 @@ class CuratedRepository(
             val backups = entries.filter { it.attributes["x-role"] == "backup" }
                 .map { CustomStationManager.generateUuidFromUrl(it.url) }
                 .toSet()
-            return CuratedPlaylist(source, stations, groups, fetchedAt, backups, english, text)
+            val regions = entries.mapNotNull { entry ->
+                entry.attributes["x-region"]?.trim()?.ifEmpty { null }
+                    ?.let { CustomStationManager.generateUuidFromUrl(entry.url) to it }
+            }.toMap()
+            return CuratedPlaylist(source, stations, groups, fetchedAt, backups, regions, english, text)
         }
+
+        /**
+         * Identity of a stream for de-duplication: no scheme, no query (tokens, signatures)
+         * and Qingting's interchangeable live hosts folded into one.
+         */
+        fun streamKey(url: String): String =
+            url.substringAfter("://").substringBefore('?').trimEnd('/').lowercase()
+                .replace("lhttp.qingting.fm/", "lhttp.qtfm.cn/")
+                .replace("lhttp-hw.qtfm.cn/", "lhttp.qtfm.cn/")
 
         private fun M3uEntry.displayGroup(english: Boolean): String? =
             (if (english) attributes["x-group-en"]?.trim()?.ifEmpty { null } else null) ?: group
