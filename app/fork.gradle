@@ -1,0 +1,42 @@
+// Fork-specific build configuration for github.com/bowen-zhang01/AMARadio.
+//
+// Everything that differs from upstream (ounben/AMARadio) at the build level lives here,
+// so upstream merges only ever touch the single `apply from: 'fork.gradle'` line in
+// app/build.gradle. See FORK.md for the release and upstream-sync workflow.
+
+// Bump for every fork release that is based on the same upstream version.
+def forkRevision = 1
+
+android {
+    defaultConfig {
+        // Own package name so the fork installs next to upstream AMARadio from Play/F-Droid.
+        applicationId "io.github.bowen_zhang01.amaradio"
+        // Upstream versionCode N becomes N * 100 + revision, which keeps fork builds
+        // monotonic across upstream bumps.
+        versionCode versionCode * 100 + forkRevision
+        versionNameSuffix "-bz${forkRevision}"
+    }
+
+    // Release signing. The keystore never lives in the repo; scripts/release.sh exports
+    // these variables from the macOS keychain. Without them, release builds keep
+    // upstream's debug signing.
+    def keystorePath = System.getenv("AMARADIO_FORK_KEYSTORE")
+    if (keystorePath) {
+        signingConfigs {
+            fork {
+                storeFile file(keystorePath)
+                storePassword System.getenv("AMARADIO_FORK_KEYSTORE_PASSWORD")
+                keyAlias System.getenv("AMARADIO_FORK_KEY_ALIAS") ?: "amaradio-fork"
+                keyPassword System.getenv("AMARADIO_FORK_KEY_PASSWORD") ?: System.getenv("AMARADIO_FORK_KEYSTORE_PASSWORD")
+            }
+        }
+        buildTypes.release.signingConfig signingConfigs.fork
+    }
+}
+
+dependencies {
+    // The Material 3 Expressive components used by the redesign (ButtonGroup,
+    // LoadingIndicator, MaterialShapes, SegmentedListItem, wavy progress, ...) are only
+    // published in the material3 1.5 alpha line; the Compose BOM still pins 1.4.0.
+    implementation "androidx.compose.material3:material3:1.5.0-alpha29"
+}
