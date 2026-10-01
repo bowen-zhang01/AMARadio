@@ -1,3 +1,7 @@
+> **Fork notice:** this is [bowen-zhang01/AMARadio](https://github.com/bowen-zhang01/AMARadio), a modified version of
+> [ounben/AMARadio](https://github.com/ounben/AMARadio) with curated Chinese radio playlists and a Material 3
+> Expressive interface. See [FORK.md](FORK.md) for the changes, releases and the upstream-sync process.
+
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![Exodus Privacy](https://img.shields.io/badge/Exodus%20Privacy-0%20Tracker-brightgreen?logo=android)](https://reports.exodus-privacy.eu.org/de/reports/com.ounben.amaradio/latest/)
 [![VirusTotal](https://img.shields.io/badge/VirusTotal-0%2F96%20Clean-brightgreen?logo=virustotal&logoColor=white)](https://www.virustotal.com/gui/url/aa8b0a5d3cdb32e328509858b39baefc0e32b72732a566510e4dfc323b0ee43e/details)
