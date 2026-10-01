@@ -64,10 +64,12 @@ import androidx.core.content.edit
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import androidx.preference.PreferenceManager
 import com.ounben.amaradio.AMARadioApp
 import com.ounben.amaradio.R
@@ -93,8 +95,9 @@ sealed class Screen(
     val selectedIcon: ImageVector = icon
 ) {
     object World : Screen("world", R.string.fork_nav_world, Icons.Outlined.Public, Icons.Filled.Public)
-    object Country : Screen("country/{code}", R.string.fork_nav_world, Icons.Outlined.Public) {
-        fun routeFor(code: String) = "country/$code"
+    /** A country, or one region of it (`region` is a key of cn-regions.json). */
+    object Country : Screen("country/{code}?region={region}", R.string.fork_nav_world, Icons.Outlined.Public) {
+        fun routeFor(code: String, region: String? = null) = if (region == null) "country/$code" else "country/$code?region=$region"
     }
     /** Upstream's station tabs (device country + custom filters), opened from the World top bar. */
     object Stations : Screen("stations", R.string.fork_advanced_filters, Icons.Rounded.Tune)
@@ -318,7 +321,14 @@ fun MainScreen(
                     composable(Screen.World.route) {
                         WorldScreen(viewModel = worldViewModel, onOpenCountry = openCountry)
                     }
-                    composable(Screen.Country.route) {
+                    composable(
+                        Screen.Country.route,
+                        arguments = listOf(navArgument("region") {
+                            type = NavType.StringType
+                            nullable = true
+                            defaultValue = null
+                        })
+                    ) {
                         val countryViewModel: CountryViewModel = viewModel()
                         CountryScreen(
                             viewModel = countryViewModel,
@@ -328,6 +338,7 @@ fun MainScreen(
                             isFavorite = isFavourite,
                             onToggleFavorite = toggleFavourite,
                             onOpenPlaylist = { source -> navController.navigate(Screen.Playlist.routeFor(source.id)) },
+                            onOpenRegion = { region -> navController.navigate(Screen.Country.routeFor(countryViewModel.code, region)) },
                             onBack = { navController.popBackStack() }
                         )
                     }

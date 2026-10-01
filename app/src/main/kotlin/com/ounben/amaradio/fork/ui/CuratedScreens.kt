@@ -86,14 +86,16 @@ private val ScreenPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp
 
 /**
  * The curated part of the China page: the bundled playlist as sections (first group as a
- * carousel, the others as artwork rows) followed by the community playlists.
+ * carousel, the others as artwork rows) followed by the playlists. "See all" on the first
+ * section opens its region (Beijing) with every station of the catalog.
  */
 internal fun LazyListScope.curatedSections(
     featured: CuratedSourceState,
     morePlaylists: List<CuratedSourceState>,
     onStationClick: (DataRadioStation) -> Unit,
     onStationLongClick: (DataRadioStation) -> Unit,
-    onOpenPlaylist: (CuratedSource) -> Unit
+    onOpenPlaylist: (CuratedSource) -> Unit,
+    onOpenRegion: (String) -> Unit
 ) {
     val playlist = featured.playlist
     if (playlist == null && featured.isLoading) {
@@ -102,11 +104,12 @@ internal fun LazyListScope.curatedSections(
     // Groups of the bundled list in order, without the backup streams.
     val sections = playlist?.primaryStations.orEmpty().groupBy { it.TagsAll }.toList()
     sections.forEachIndexed { index, (group, stations) ->
+        val region = if (index == 0) stations.firstNotNullOfOrNull { playlist?.regions?.get(it.StationUuid) } else null
         item(key = "featured-header-$group") {
             SectionHeader(
                 title = group,
-                actionLabel = if (index == 0) stringResource(R.string.fork_home_see_all) else null,
-                onAction = { onOpenPlaylist(featured.source) }
+                actionLabel = if (region != null) stringResource(R.string.fork_home_see_all) else null,
+                onAction = { region?.let(onOpenRegion) }
             )
         }
         item(key = "featured-row-$group") {

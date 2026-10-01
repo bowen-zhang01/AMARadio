@@ -8,7 +8,7 @@
     <string name="fork_action_retry">重试</string>
 
     <string name="fork_curated_beijing_title">北京与中央台</string>
-    <string name="fork_curated_beijing_desc">北京台、央广、国际台官方直播流，逐个验证过</string>
+    <string name="fork_curated_beijing_desc">北京台广播和电视伴音、各区广播、央广、国际台的官方直播流，逐个验证过</string>
     <string name="fork_curated_provincial_title">央广与各省台</string>
     <string name="fork_curated_provincial_desc">按省份分组，由 huangsuming/iptv 维护</string>
     <string name="fork_curated_china_title">中国电台（自动检测）</string>
@@ -88,4 +88,6 @@
     <string name="fork_proxy_type">代理类型</string>
     <string name="fork_world_popular_short">全球热门</string>
     <string name="fork_world_popular_desc_short">播放最多</string>
+    <string name="fork_region_verified">精选 · 已验证</string>
+    <string name="fork_region_catalog">更多电台</string>
 </resources>
