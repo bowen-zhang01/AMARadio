@@ -165,4 +165,18 @@ internal class M3uPlaylistTest {
         // Stations without x-country have no flag.
         assertEquals("", playlist.stations.first { it.Name.startsWith("上海麗都") }.CountryCode)
     }
+
+    @Test
+    fun everyGhostStoryEntryHasAirTimes() {
+        val playlist = CuratedRepository.toPlaylist(
+            CuratedSources.spookyStories, File("src/main/assets/curated/spooky-stories.m3u").readText(), null
+        )
+
+        assertEquals(12, playlist.stations.size)
+        assertEquals(listOf("港新灵异节目", "深夜悬疑"), playlist.groups)
+        // These programmes are only on at set times, so the list must be able to say when.
+        assertEquals(playlist.stations.map { it.StationUuid }.toSet(), playlist.schedules.keys)
+        val jiangsu = playlist.stations.first { it.Name.contains("江苏故事广播") }
+        assertEquals(3, playlist.schedules.getValue(jiangsu.StationUuid).size)
+    }
 }

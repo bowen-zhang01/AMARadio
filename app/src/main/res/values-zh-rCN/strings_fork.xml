@@ -98,4 +98,8 @@
     <string name="fork_schedule_next">下一档：%1$s</string>
     <string name="fork_schedule_today">今天 %1$s</string>
     <string name="fork_schedule_tomorrow">明天 %1$s</string>
+    <string name="fork_curated_spooky_title">灵异怪谈</string>
+    <string name="fork_curated_spooky_desc">鬼故事、灵异和民间怪谈：港台灵异节目和各地故事广播的深夜节目，按你所在的时区显示下一档时间</string>
+    <string name="fork_world_spooky_short">灵异怪谈</string>
+    <string name="fork_world_spooky_desc_short">深夜鬼故事</string>
 </resources>

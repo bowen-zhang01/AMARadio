@@ -101,6 +101,19 @@ STATIONS = [
     ("dubai-chinese", "中东", "迪拜", "华人广播", ("#FFB74D", "#8D4A00")),
     ("jakarta-983", "雅加达", "华语台", "FM 98.3", ("#EC407A", "#6A1B4D")),
     ("bigcow", "大马", "大牛", "BIGCOWFM", ("#43A047", "#123D17")),
+    # Ghost stories playlist (curated/spooky-stories.m3u)
+    ("bba-haunted", "香港", "恐怖在線", "BBA Free", ("#8E1B1B", "#140505")),
+    ("love972-ghost", "新加坡", "周公讲鬼", "LOVE 972", ("#5E35B1", "#140A2E")),
+    ("rthk2-ghost", "香港", "三五成群", "靈靈異", ("#00695C", "#03201C")),
+    ("handan-theatre", "邯郸", "悬疑剧场", "新闻综合广播", ("#37474F", "#0A0F12")),
+    ("liaoyuan-ghost", "辽源", "鬼故事", "901 文艺广播", ("#4A148C", "#12051F")),
+    ("jiangsu-suspense", "江苏", "午夜悬疑", "故事广播", ("#283593", "#070B24")),
+    ("jinan-night-stories", "济南", "深夜故事", "FM 103.1", ("#263238", "#05080A")),
+    ("liaocheng-ghost-lamp", "聊城", "鬼吹灯", "小说连播", ("#33691E", "#0B1703")),
+    ("xuzhou-theatre", "徐州", "悬疑剧场", "FM 105", ("#00838F", "#021B1E")),
+    ("beijing-midnight-thrillers", "北京", "拍案惊奇", "FM 87.6", ("#880E4F", "#1F0412")),
+    ("jinan-yueye", "济南", "惊心", "越夜越惊心", ("#B71C1C", "#1A0505")),
+    ("changde-lost-tomb", "常德", "盗墓笔记", "FM 97.1", ("#6D4C41", "#1A110D")),
 ]
 
 

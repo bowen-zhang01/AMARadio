@@ -45,6 +45,16 @@ object CuratedSources {
         countryCode = ""
     )
 
+    val spookyStories = CuratedSource(
+        id = "spooky-stories",
+        titleRes = R.string.fork_curated_spooky_title,
+        descriptionRes = R.string.fork_curated_spooky_desc,
+        assetPath = "curated/spooky-stories.m3u",
+        updateUrl = "https://raw.githubusercontent.com/bowen-zhang01/AMARadio/master/app/src/main/assets/curated/spooky-stories.m3u",
+        homepageUrl = "https://github.com/bowen-zhang01/AMARadio",
+        countryCode = ""
+    )
+
     val cnrProvincial = CuratedSource(
         id = "cnr-provincial",
         titleRes = R.string.fork_curated_provincial_title,
@@ -61,7 +71,7 @@ object CuratedSources {
         homepageUrl = "https://github.com/junguler/m3u-radio-music-playlists"
     )
 
-    val all: List<CuratedSource> = listOf(beijingNational, chineseUnderground, cnrProvincial, chinaChecked)
+    val all: List<CuratedSource> = listOf(beijingNational, chineseUnderground, spookyStories, cnrProvincial, chinaChecked)
 
     fun byId(id: String): CuratedSource? = all.firstOrNull { it.id == id }
 }
