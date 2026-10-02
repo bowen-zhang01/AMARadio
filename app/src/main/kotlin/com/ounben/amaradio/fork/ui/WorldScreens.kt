@@ -83,6 +83,9 @@ private const val WORLD_EMOJI = "🌏"
 /** Emoji of the Chinese underground & indie playlist. */
 private const val UNDERGROUND_EMOJI = "🎧"
 
+/** Emoji of the ghost stories playlist. */
+private const val SPOOKY_EMOJI = "👻"
+
 /**
  * World tab, the app's start screen: shortcuts to nearby and recent countries, then every
  * country of the catalog grouped by continent.
@@ -206,6 +209,15 @@ private fun ShortcutRow(shortcuts: List<CountryItem>, onOpenCountry: (String) ->
                 onClick = { onOpenPlaylist(CuratedSources.chineseUnderground) }
             )
         }
+        item(key = CuratedSources.spookyStories.id) {
+            ShortcutCard(
+                emoji = SPOOKY_EMOJI,
+                title = stringResource(R.string.fork_world_spooky_short),
+                subtitle = stringResource(R.string.fork_world_spooky_desc_short),
+                style = ShortcutStyle.Secondary,
+                onClick = { onOpenPlaylist(CuratedSources.spookyStories) }
+            )
+        }
         items(shortcuts, key = { it.code }) { country ->
             ShortcutCard(
                 emoji = EmojiUtils.getFlagEmoji(country.code).orEmpty(),
@@ -218,7 +230,7 @@ private fun ShortcutRow(shortcuts: List<CountryItem>, onOpenCountry: (String) ->
     }
 }
 
-private enum class ShortcutStyle { Primary, Tertiary, Plain }
+private enum class ShortcutStyle { Primary, Secondary, Tertiary, Plain }
 
 @Composable
 private fun ShortcutCard(emoji: String, title: String, subtitle: String, style: ShortcutStyle, onClick: () -> Unit) {
@@ -227,6 +239,10 @@ private fun ShortcutCard(emoji: String, title: String, subtitle: String, style: 
         ShortcutStyle.Primary -> CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer,
             contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+        )
+        ShortcutStyle.Secondary -> CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.secondaryContainer,
+            contentColor = MaterialTheme.colorScheme.onSecondaryContainer
         )
         ShortcutStyle.Tertiary -> CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.tertiaryContainer,

@@ -98,4 +98,12 @@
     <string name="fork_curated_underground_desc">Independent and underground music, niche Hong Kong and Taiwan stations, overseas Chinese community radio and international Chinese-language services, each checked by hand</string>
     <string name="fork_world_underground_short">Underground</string>
     <string name="fork_world_underground_desc_short">Chinese indie &amp; niche</string>
+    <string name="fork_schedule_on_air">🔴 On air now</string>
+    <string name="fork_schedule_next">Next: %1$s</string>
+    <string name="fork_schedule_today">today %1$s</string>
+    <string name="fork_schedule_tomorrow">tomorrow %1$s</string>
+    <string name="fork_curated_spooky_title">Ghost stories &amp; strange tales</string>
+    <string name="fork_curated_spooky_desc">Chinese ghost stories, the paranormal and folk tales: Hong Kong and Taiwan shows and the late-night programmes of Chinese story radio, with the next air time in your time zone</string>
+    <string name="fork_world_spooky_short">Ghost stories</string>
+    <string name="fork_world_spooky_desc_short">Late-night tales</string>
 </resources>

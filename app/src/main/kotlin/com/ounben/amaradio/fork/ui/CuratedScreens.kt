@@ -73,6 +73,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.ounben.amaradio.R
+import kotlinx.coroutines.delay
+import java.time.format.DateTimeFormatter
+import java.time.ZonedDateTime
+import com.ounben.amaradio.fork.curated.ScheduleSlot
+import com.ounben.amaradio.fork.curated.ProgrammeSchedule
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.runtime.produceState
 import com.ounben.amaradio.fork.curated.CuratedSource
 import com.ounben.amaradio.fork.curated.CuratedSourceState
 import com.ounben.amaradio.fork.curated.CuratedViewModel
@@ -413,7 +420,8 @@ private fun LazyListScope.playlistBody(
                     onFavoriteClick = { onFavoriteClick(station) },
                     onLongClick = { onLongClick(station) },
                     index = index,
-                    count = visible.size
+                    count = visible.size,
+                    supportingOverride = playlist.schedules[station.StationUuid]?.let { scheduleText(it) }
                 )
             }
         }
@@ -505,4 +513,29 @@ private fun PlaylistCard(state: CuratedSourceState, onClick: () -> Unit) {
             Icon(Icons.Rounded.ChevronRight, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
         }
     }
+}
+
+/**
+ * When a scheduled programme is on, in the device's time zone: "On air now" during a
+ * broadcast, otherwise the next start ("Next: today 23:10", "Next: Fri 01:10").
+ */
+@Composable
+internal fun scheduleText(slots: List<ScheduleSlot>): String? {
+    val now by produceState(ZonedDateTime.now()) {
+        while (true) {
+            delay(30_000)
+            value = ZonedDateTime.now()
+        }
+    }
+    val airing = remember(slots, now.withSecond(0).withNano(0)) { ProgrammeSchedule.nextAiring(slots, now) } ?: return null
+    if (airing.isOnAir(now)) return stringResource(R.string.fork_schedule_on_air)
+    val locale = LocalConfiguration.current.locales[0]
+    val start = airing.start.withZoneSameInstant(now.zone)
+    val time = start.format(DateTimeFormatter.ofPattern("HH:mm", locale))
+    val day = when (start.toLocalDate()) {
+        now.toLocalDate() -> stringResource(R.string.fork_schedule_today, time)
+        now.toLocalDate().plusDays(1) -> stringResource(R.string.fork_schedule_tomorrow, time)
+        else -> start.format(DateTimeFormatter.ofPattern("EEE", locale)) + " " + time
+    }
+    return stringResource(R.string.fork_schedule_next, day)
 }
