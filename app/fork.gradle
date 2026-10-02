@@ -5,7 +5,7 @@
 // app/build.gradle. See FORK.md for the release and upstream-sync workflow.
 
 // Bump for every fork release that is based on the same upstream version.
-def forkRevision = 4
+def forkRevision = 5
 
 android {
     defaultConfig {
