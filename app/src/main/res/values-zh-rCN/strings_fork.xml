@@ -94,4 +94,8 @@
     <string name="fork_curated_underground_desc">独立和地下音乐、港台小众电台、海外华人电台和境外华语广播，逐个验证过</string>
     <string name="fork_world_underground_short">华语地下</string>
     <string name="fork_world_underground_desc_short">独立 · 小众</string>
+    <string name="fork_schedule_on_air">🔴 正在播出</string>
+    <string name="fork_schedule_next">下一档：%1$s</string>
+    <string name="fork_schedule_today">今天 %1$s</string>
+    <string name="fork_schedule_tomorrow">明天 %1$s</string>
 </resources>

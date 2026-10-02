@@ -498,7 +498,9 @@ fun StationListItem(
     @Suppress("UNUSED_PARAMETER") useInternalClickable: Boolean = true,
     dragHandle: (@Composable (Modifier) -> Unit)? = null,
     index: Int = 0,
-    count: Int = 1
+    count: Int = 1,
+    /** Replaces the detail line, e.g. with the next air time of a scheduled programme. */
+    supportingOverride: String? = null
 ) {
     val context = LocalContext.current
     val isPlaying = LocalPlayingStationUuid.current == station.StationUuid
@@ -507,7 +509,7 @@ fun StationListItem(
     val details = remember(station.ClickCount, station.Language, station.Bitrate, station.Codec, locale) {
         StationDetails.short(station, context, locale)
     }
-    val supporting = listOf(flagEmoji, details, station.TagsAll.takeIf { details.isBlank() }.orEmpty())
+    val supporting = listOf(flagEmoji, supportingOverride ?: details, station.TagsAll.takeIf { details.isBlank() && supportingOverride == null }.orEmpty())
         .filter { it.isNotBlank() }
         .joinToString(" ")
 

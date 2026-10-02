@@ -23,6 +23,8 @@ data class CuratedPlaylist(
     val backupUuids: Set<String> = emptySet(),
     /** Region key (as in `cn-regions.json`) per station id, from `x-region="…"`. */
     val regions: Map<String, String> = emptyMap(),
+    /** Air times per station id for programmes that are only on at set times (`x-schedule`). */
+    val schedules: Map<String, List<ScheduleSlot>> = emptyMap(),
     /** Whether names come from the `x-name-en` / `x-group-en` attributes. */
     val english: Boolean = false,
     /** The M3U text, kept to re-label the stations when the interface language changes. */
@@ -155,7 +157,11 @@ class CuratedRepository(
                 entry.attributes["x-region"]?.trim()?.ifEmpty { null }
                     ?.let { CustomStationManager.generateUuidFromUrl(entry.url) to it }
             }.toMap()
-            return CuratedPlaylist(source, stations, groups, fetchedAt, backups, regions, english, text)
+            val schedules = entries.mapNotNull { entry ->
+                entry.attributes["x-schedule"]?.let { ProgrammeSchedule.parse(it) }?.takeIf { it.isNotEmpty() }
+                    ?.let { CustomStationManager.generateUuidFromUrl(entry.url) to it }
+            }.toMap()
+            return CuratedPlaylist(source, stations, groups, fetchedAt, backups, regions, schedules, english, text)
         }
 
         /**
